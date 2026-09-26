@@ -5,6 +5,7 @@ plugins {
 
 android {
     namespace = "com.seef.checkqr.voice"
+    buildFeatures { buildConfig = false }
 }
 
 dependencies {
@@ -12,10 +13,9 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:data"))
 
-    implementation(libs.androidx.lifecycle.service)
-    // MediaSession real: legitima el tipo mediaPlayback del servicio en primer plano.
-    implementation(libs.androidx.media3.session)
-    implementation(libs.androidx.media3.common)
+    // Se usa la MediaSession de la plataforma (android.media.session) y no la de
+    // media3: media3 exige una implementacion completa de Player para algo que
+    // aqui solo necesita informar un estado de reproduccion activo.
 
     testImplementation(libs.mockk)
 }

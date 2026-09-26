@@ -1,0 +1,9 @@
+<resources>
+    <string name="canal_caja_abierta">Caja abierta</string>
+    <string name="canal_caja_abierta_descripcion">Aviso fijo mientras la app escucha los pagos y los anuncia por voz.</string>
+    <string name="caja_abierta_titulo">Caja abierta</string>
+    <string name="caja_abierta_texto">Escuchando pagos</string>
+    <string name="cerrar_caja">Cerrar caja</string>
+    <string name="abrir_caja">Abrir caja</string>
+    <string name="reactivar_voz">Toca para reactivar la voz</string>
+</resources>

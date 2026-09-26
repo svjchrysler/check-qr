@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!--
+      Android 17: reproducir audio o pedir el foco de audio sin pantalla visible
+      exige un servicio en primer plano, y con targetSdk 37 ese servicio tiene
+      que haberse iniciado por una accion del usuario o con la app visible. Si no,
+      el audio falla en silencio, sin ningun error.
+    -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+
+    <application>
+        <service
+            android:name="com.seef.checkqr.voice.ServicioDeCaja"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
+        <!--
+          RESPALDO si Play objeta el tipo mediaPlayback.
+
+          Reemplazar el bloque de arriba por este, y el permiso de arriba por
+          FOREGROUND_SERVICE_SPECIAL_USE. Play exige describir el uso y adjuntar
+          un video que muestre como lo activa el usuario; la justificacion es:
+          "anuncia por voz los pagos recibidos mientras el comerciante tiene la
+          caja abierta, para que no tenga que mirar la pantalla".
+
+          <service
+              android:name="com.seef.checkqr.voice.ServicioDeCaja"
+              android:exported="false"
+              android:foregroundServiceType="specialUse">
+              <property
+                  android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                  android:value="Anuncio por voz de los pagos recibidos mientras la caja esta abierta" />
+          </service>
+        -->
+    </application>
+
+</manifest>

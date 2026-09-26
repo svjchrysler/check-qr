@@ -8,4 +8,5 @@ android {
 
 dependencies {
     implementation(project(":voice"))
+    implementation(project(":core:datastore"))
 }
