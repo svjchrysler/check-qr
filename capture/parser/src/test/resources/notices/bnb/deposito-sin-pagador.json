@@ -1,0 +1,15 @@
+{
+  "descripcion": "BNB, deposito sin nombre del pagador",
+  "real": false,
+  "aviso": {
+    "sourcePackage": "com.bnb.movil",
+    "titulo": "BNB Movil",
+    "texto": "Deposito recibido por Bs 75,50"
+  },
+  "esperado": {
+    "tipo": "cobro",
+    "wallet": "BNB",
+    "amountCents": 7550,
+    "confidence": "PARCIAL"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "descripcion": "Yape, pago recibido con nombre del pagador",
+  "real": false,
+  "aviso": {
+    "sourcePackage": "com.bcp.innovacxion.yapeapp",
+    "titulo": "Yape",
+    "texto": "Recibiste un pago de Bs 50,00 de Juan Perez"
+  },
+  "esperado": {
+    "tipo": "cobro",
+    "wallet": "YAPE",
+    "amountCents": 5000,
+    "payerName": "Juan Perez",
+    "confidence": "PARCIAL"
+  }
+}

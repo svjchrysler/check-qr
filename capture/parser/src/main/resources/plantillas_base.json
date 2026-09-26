@@ -1,0 +1,98 @@
+{
+  "version": 0,
+  "generado_en_millis": 0,
+  "templates": [
+    {
+      "wallet": "YAPE",
+      "packages": [
+        "com.bcp.innovacxion.yapeapp",
+        "com.bcp.bo.yape"
+      ],
+      "patrones_titulo": [],
+      "patron_cuerpo": "(?:recibiste|te\\s+yape[oó]|yapeo)\\D{0,30}Bs\\.?\\s*(?<monto>[\\d.,]+)(?:\\D{0,20}de\\s+(?<pagador>(?:(?!\\s*(?:ref|referencia|n[uú]mero|c[oó]digo|transacci[oó]n)\\b)[^.,\\n]){2,60}))?",
+      "formato_monto": "auto",
+      "patrones_excluir": [
+        "\\b(?:enviaste|yapeaste|pagaste|transferiste|retiraste)\\b",
+        "\\bsaldo\\s+(?:disponible|actual)\\b",
+        "\\bc[oó]digo\\b"
+      ],
+      "prioridad": 10
+    },
+    {
+      "wallet": "BCP",
+      "packages": [
+        "com.bcp.bo.bancamovil",
+        "bo.com.bcp.bancamovil"
+      ],
+      "patrones_titulo": [],
+      "patron_cuerpo": "(?:recibiste|abono|dep[oó]sito|transferencia\\s+recibida)\\D{0,30}Bs\\.?\\s*(?<monto>[\\d.,]+)(?:\\D{0,20}de\\s+(?<pagador>(?:(?!\\s*(?:ref|referencia|n[uú]mero|c[oó]digo|transacci[oó]n)\\b)[^.,\\n]){2,60}))?(?:\\D{0,30}(?:ref|referencia|n[uú]mero)\\.?\\s*:?\\s*(?<referencia>[A-Za-z0-9-]{4,30}))?",
+      "formato_monto": "auto",
+      "patrones_excluir": [
+        "\\b(?:enviaste|pagaste|transferiste|d[eé]bito|cargo|retiro|compra)\\b",
+        "\\bc[oó]digo\\b"
+      ],
+      "prioridad": 10
+    },
+    {
+      "wallet": "BNB",
+      "packages": [
+        "com.bnb.movil",
+        "bo.com.bnb.bnbmovil"
+      ],
+      "patrones_titulo": [],
+      "patron_cuerpo": "(?:recibiste|abono|dep[oó]sito|cr[eé]dito|transferencia\\s+recibida)\\D{0,30}Bs\\.?\\s*(?<monto>[\\d.,]+)(?:\\D{0,20}de\\s+(?<pagador>(?:(?!\\s*(?:ref|referencia|n[uú]mero|c[oó]digo|transacci[oó]n)\\b)[^.,\\n]){2,60}))?(?:\\D{0,30}(?:ref|referencia)\\.?\\s*:?\\s*(?<referencia>[A-Za-z0-9-]{4,30}))?",
+      "formato_monto": "auto",
+      "patrones_excluir": [
+        "\\b(?:enviaste|pagaste|transferiste|d[eé]bito|cargo|retiro|compra)\\b",
+        "\\bc[oó]digo\\b"
+      ],
+      "prioridad": 10
+    },
+    {
+      "wallet": "MERCANTIL",
+      "packages": [
+        "com.mercantilsantacruz.movil",
+        "bo.com.bmsc.movil"
+      ],
+      "patrones_titulo": [],
+      "patron_cuerpo": "(?:recibiste|abono|dep[oó]sito|cr[eé]dito|transferencia\\s+recibida)\\D{0,30}Bs\\.?\\s*(?<monto>[\\d.,]+)(?:\\D{0,20}de\\s+(?<pagador>(?:(?!\\s*(?:ref|referencia|n[uú]mero|c[oó]digo|transacci[oó]n)\\b)[^.,\\n]){2,60}))?(?:\\D{0,30}(?:ref|referencia)\\.?\\s*:?\\s*(?<referencia>[A-Za-z0-9-]{4,30}))?",
+      "formato_monto": "auto",
+      "patrones_excluir": [
+        "\\b(?:enviaste|pagaste|transferiste|d[eé]bito|cargo|retiro|compra)\\b",
+        "\\bc[oó]digo\\b"
+      ],
+      "prioridad": 10
+    },
+    {
+      "wallet": "UNION",
+      "packages": [
+        "com.bancounion.movil",
+        "bo.com.bancounion.unimovil"
+      ],
+      "patrones_titulo": [],
+      "patron_cuerpo": "(?:recibiste|abono|dep[oó]sito|cr[eé]dito|transferencia\\s+recibida)\\D{0,30}Bs\\.?\\s*(?<monto>[\\d.,]+)(?:\\D{0,20}de\\s+(?<pagador>(?:(?!\\s*(?:ref|referencia|n[uú]mero|c[oó]digo|transacci[oó]n)\\b)[^.,\\n]){2,60}))?(?:\\D{0,30}(?:ref|referencia)\\.?\\s*:?\\s*(?<referencia>[A-Za-z0-9-]{4,30}))?",
+      "formato_monto": "auto",
+      "patrones_excluir": [
+        "\\b(?:enviaste|pagaste|transferiste|d[eé]bito|cargo|retiro|compra)\\b",
+        "\\bc[oó]digo\\b"
+      ],
+      "prioridad": 10
+    },
+    {
+      "wallet": "TIGO_MONEY",
+      "packages": [
+        "com.tigo.money.bo",
+        "bo.com.tigo.tigomoney"
+      ],
+      "patrones_titulo": [],
+      "patron_cuerpo": "(?:recibiste|te\\s+enviaron|abono|dep[oó]sito)\\D{0,30}Bs\\.?\\s*(?<monto>[\\d.,]+)(?:\\D{0,20}de\\s+(?<pagador>(?:(?!\\s*(?:ref|referencia|n[uú]mero|c[oó]digo|transacci[oó]n)\\b)[^.,\\n]){2,60}))?(?:\\D{0,30}(?:ref|referencia|transacci[oó]n)\\.?\\s*:?\\s*(?<referencia>[A-Za-z0-9-]{4,30}))?",
+      "formato_monto": "auto",
+      "patrones_excluir": [
+        "\\b(?:enviaste|pagaste|transferiste|retiraste|compra)\\b",
+        "\\bsaldo\\b",
+        "\\bc[oó]digo\\b"
+      ],
+      "prioridad": 10
+    }
+  ]
+}

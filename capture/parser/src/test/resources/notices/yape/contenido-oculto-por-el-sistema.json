@@ -1,0 +1,6 @@
+{
+  "descripcion": "Yape, aviso que llego sin contenido legible (redaccion de Android 15+)",
+  "real": false,
+  "aviso": { "sourcePackage": "com.bcp.innovacxion.yapeapp" },
+  "esperado": { "tipo": "contenido_oculto" }
+}

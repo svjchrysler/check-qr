@@ -1,0 +1,16 @@
+{
+  "descripcion": "Tigo Money, dinero recibido",
+  "real": false,
+  "aviso": {
+    "sourcePackage": "com.tigo.money.bo",
+    "titulo": "Tigo Money",
+    "texto": "Te enviaron Bs 20,00 de Carlos Mamani"
+  },
+  "esperado": {
+    "tipo": "cobro",
+    "wallet": "TIGO_MONEY",
+    "amountCents": 2000,
+    "payerName": "Carlos Mamani",
+    "confidence": "PARCIAL"
+  }
+}

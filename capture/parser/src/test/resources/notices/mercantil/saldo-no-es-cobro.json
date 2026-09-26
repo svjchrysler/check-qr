@@ -1,0 +1,10 @@
+{
+  "descripcion": "Mercantil, aviso de saldo: ninguna plantilla debe reconocerlo como cobro",
+  "real": false,
+  "aviso": {
+    "sourcePackage": "com.mercantilsantacruz.movil",
+    "titulo": "Mercantil Santa Cruz",
+    "texto": "Tu saldo disponible es Bs 4.500,00"
+  },
+  "esperado": { "tipo": "no_reconocido" }
+}

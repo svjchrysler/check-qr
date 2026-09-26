@@ -1,0 +1,10 @@
+{
+  "descripcion": "Yape, pago SALIENTE: no es un cobro y debe descartarse",
+  "real": false,
+  "aviso": {
+    "sourcePackage": "com.bcp.innovacxion.yapeapp",
+    "titulo": "Yape",
+    "texto": "Enviaste Bs 50,00 a Maria Lopez"
+  },
+  "esperado": { "tipo": "no_es_cobro" }
+}

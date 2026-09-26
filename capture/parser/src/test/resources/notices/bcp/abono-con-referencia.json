@@ -1,0 +1,18 @@
+{
+  "descripcion": "BCP, abono en cuenta con referencia, en el texto largo",
+  "real": false,
+  "aviso": {
+    "sourcePackage": "com.bcp.bo.bancamovil",
+    "titulo": "Banca Movil BCP",
+    "texto": "Nuevo movimiento",
+    "textoLargo": "Abono por Bs 1.234,56 de Ana Quispe Ref: AB12CD34"
+  },
+  "esperado": {
+    "tipo": "cobro",
+    "wallet": "BCP",
+    "amountCents": 123456,
+    "payerName": "Ana Quispe",
+    "reference": "AB12CD34",
+    "confidence": "COMPLETA"
+  }
+}
