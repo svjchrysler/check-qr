@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <!--
+          Inyector de avisos de prueba. Solo en la variante debug: permite
+          ejercitar toda la cadena de captura sin hacer transferencias reales.
+
+          exported=true porque tiene que poder invocarse desde adb, y por eso
+          mismo NO puede existir en release.
+        -->
+        <receiver
+            android:name="com.seef.checkqr.capture.listener.debugtools.InyectorDeAvisos"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.seef.checkqr.INYECTAR_AVISO" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

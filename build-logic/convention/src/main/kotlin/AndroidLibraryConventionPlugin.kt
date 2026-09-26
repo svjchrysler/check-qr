@@ -1,6 +1,7 @@
 import com.android.build.api.dsl.LibraryExtension
 import com.seef.checkqr.build.configureKotlinAndroid
 import com.seef.checkqr.build.libs
+import com.seef.checkqr.build.versionInt
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -14,6 +15,10 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             configureKotlinAndroid(this)
             // En AGP 9 las librerias no declaran targetSdk; lo hereda la app.
             testOptions.animationsDisabled = true
+            // Los tests de JVM corren con Robolectric, que todavia no trae el
+            // SDK 37: sin esto fallan al arrancar con "targetSdkVersion=37 >
+            // maxSdkVersion=36". AGP solo acepta este ajuste en librerias.
+            testOptions.targetSdk = libs.versionInt("robolectricSdk")
         }
 
         dependencies {

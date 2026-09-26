@@ -1,0 +1,515 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "e526c1dac6dcfb6d63037d9dc61a866c",
+    "entities": [
+      {
+        "tableName": "pagos",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `dedup_key` TEXT NOT NULL, `wallet` TEXT NOT NULL, `source_package` TEXT NOT NULL, `amount_cents` INTEGER NOT NULL, `currency` TEXT NOT NULL, `payer_name` TEXT, `reference` TEXT, `notif_posted_at_millis` INTEGER NOT NULL, `captured_at_millis` INTEGER NOT NULL, `level` TEXT NOT NULL, `confidence` TEXT NOT NULL, `sync_state` TEXT NOT NULL, `shift_id` TEXT, `cashier_id` TEXT, `claimed_by_receipt_id` TEXT, `raw_text` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dedupKey",
+            "columnName": "dedup_key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "walletId",
+            "columnName": "wallet",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourcePackage",
+            "columnName": "source_package",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "amountCents",
+            "columnName": "amount_cents",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currency",
+            "columnName": "currency",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "payerName",
+            "columnName": "payer_name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "reference",
+            "columnName": "reference",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "notifPostedAtMillis",
+            "columnName": "notif_posted_at_millis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "capturedAtMillis",
+            "columnName": "captured_at_millis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "levelId",
+            "columnName": "level",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "confidenceId",
+            "columnName": "confidence",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "syncStateId",
+            "columnName": "sync_state",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shiftId",
+            "columnName": "shift_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "cashierId",
+            "columnName": "cashier_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "claimedByReceiptId",
+            "columnName": "claimed_by_receipt_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "rawText",
+            "columnName": "raw_text",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_pagos_dedup_key",
+            "unique": true,
+            "columnNames": [
+              "dedup_key"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_pagos_dedup_key` ON `${TABLE_NAME}` (`dedup_key`)"
+          },
+          {
+            "name": "index_pagos_notif_posted_at_millis",
+            "unique": false,
+            "columnNames": [
+              "notif_posted_at_millis"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_pagos_notif_posted_at_millis` ON `${TABLE_NAME}` (`notif_posted_at_millis`)"
+          },
+          {
+            "name": "index_pagos_shift_id",
+            "unique": false,
+            "columnNames": [
+              "shift_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_pagos_shift_id` ON `${TABLE_NAME}` (`shift_id`)"
+          },
+          {
+            "name": "index_pagos_claimed_by_receipt_id",
+            "unique": false,
+            "columnNames": [
+              "claimed_by_receipt_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_pagos_claimed_by_receipt_id` ON `${TABLE_NAME}` (`claimed_by_receipt_id`)"
+          },
+          {
+            "name": "index_pagos_sync_state",
+            "unique": false,
+            "columnNames": [
+              "sync_state"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_pagos_sync_state` ON `${TABLE_NAME}` (`sync_state`)"
+          }
+        ]
+      },
+      {
+        "tableName": "turnos",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `cashier_id` TEXT NOT NULL, `device_id` TEXT NOT NULL, `opened_at_millis` INTEGER NOT NULL, `closed_at_millis` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cashierId",
+            "columnName": "cashier_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deviceId",
+            "columnName": "device_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "openedAtMillis",
+            "columnName": "opened_at_millis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "closedAtMillis",
+            "columnName": "closed_at_millis",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_turnos_closed_at_millis",
+            "unique": false,
+            "columnNames": [
+              "closed_at_millis"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_turnos_closed_at_millis` ON `${TABLE_NAME}` (`closed_at_millis`)"
+          },
+          {
+            "name": "index_turnos_cashier_id",
+            "unique": false,
+            "columnNames": [
+              "cashier_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_turnos_cashier_id` ON `${TABLE_NAME}` (`cashier_id`)"
+          }
+        ]
+      },
+      {
+        "tableName": "miembros",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `nombre` TEXT NOT NULL, `role` TEXT NOT NULL, `cuenta_google` TEXT, `activo` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nombre",
+            "columnName": "nombre",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "roleId",
+            "columnName": "role",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cuentaGoogle",
+            "columnName": "cuenta_google",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "activo",
+            "columnName": "activo",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "comprobantes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `captured_at_millis` INTEGER NOT NULL, `texto_ocr` TEXT NOT NULL, `amount_cents` INTEGER, `reference` TEXT, `matched_payment_id` TEXT, `resultado` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "capturedAtMillis",
+            "columnName": "captured_at_millis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "textoOcr",
+            "columnName": "texto_ocr",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "amountCents",
+            "columnName": "amount_cents",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "reference",
+            "columnName": "reference",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "matchedPaymentId",
+            "columnName": "matched_payment_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "resultadoId",
+            "columnName": "resultado",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_comprobantes_matched_payment_id",
+            "unique": false,
+            "columnNames": [
+              "matched_payment_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_comprobantes_matched_payment_id` ON `${TABLE_NAME}` (`matched_payment_id`)"
+          }
+        ]
+      },
+      {
+        "tableName": "avisos_no_reconocidos",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `source_package` TEXT NOT NULL, `titulo` TEXT, `texto` TEXT, `posted_at_millis` INTEGER NOT NULL, `compartido` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourcePackage",
+            "columnName": "source_package",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "titulo",
+            "columnName": "titulo",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "texto",
+            "columnName": "texto",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "postedAtMillis",
+            "columnName": "posted_at_millis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "compartido",
+            "columnName": "compartido",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_avisos_no_reconocidos_source_package",
+            "unique": false,
+            "columnNames": [
+              "source_package"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_avisos_no_reconocidos_source_package` ON `${TABLE_NAME}` (`source_package`)"
+          },
+          {
+            "name": "index_avisos_no_reconocidos_posted_at_millis",
+            "unique": false,
+            "columnNames": [
+              "posted_at_millis"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_avisos_no_reconocidos_posted_at_millis` ON `${TABLE_NAME}` (`posted_at_millis`)"
+          }
+        ]
+      },
+      {
+        "tableName": "senal_por_banco",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`source_package` TEXT NOT NULL, `wallet` TEXT NOT NULL, `ultimo_aviso_millis` INTEGER NOT NULL, `ultimo_oculto` INTEGER NOT NULL, PRIMARY KEY(`source_package`))",
+        "fields": [
+          {
+            "fieldPath": "sourcePackage",
+            "columnName": "source_package",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "walletId",
+            "columnName": "wallet",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ultimoAvisoMillis",
+            "columnName": "ultimo_aviso_millis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ultimoOculto",
+            "columnName": "ultimo_oculto",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "source_package"
+          ]
+        }
+      },
+      {
+        "tableName": "captura_cruda_debug",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`rowId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `source_package` TEXT NOT NULL, `titulo` TEXT, `texto` TEXT, `texto_largo` TEXT, `subtexto` TEXT, `lineas` TEXT, `posted_at_millis` INTEGER NOT NULL, `en_lista_blanca` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "rowId",
+            "columnName": "rowId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourcePackage",
+            "columnName": "source_package",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "titulo",
+            "columnName": "titulo",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "texto",
+            "columnName": "texto",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "textoLargo",
+            "columnName": "texto_largo",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "subtexto",
+            "columnName": "subtexto",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "lineas",
+            "columnName": "lineas",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "postedAtMillis",
+            "columnName": "posted_at_millis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "enListaBlanca",
+            "columnName": "en_lista_blanca",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "rowId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_captura_cruda_debug_source_package",
+            "unique": false,
+            "columnNames": [
+              "source_package"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_captura_cruda_debug_source_package` ON `${TABLE_NAME}` (`source_package`)"
+          },
+          {
+            "name": "index_captura_cruda_debug_posted_at_millis",
+            "unique": false,
+            "columnNames": [
+              "posted_at_millis"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_captura_cruda_debug_posted_at_millis` ON `${TABLE_NAME}` (`posted_at_millis`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e526c1dac6dcfb6d63037d9dc61a866c')"
+    ]
+  }
+}

@@ -11,4 +11,6 @@ dependencies {
     api(project(":core:model"))
     implementation(project(":core:common"))
     implementation(libs.androidx.datastore.preferences)
+
+    testImplementation(libs.kotlinx.coroutines.test)
 }

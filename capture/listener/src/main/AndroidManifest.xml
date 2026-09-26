@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <!--
+          El acceso a notificaciones lo concede el usuario a mano, en los ajustes
+          del sistema. Ademas, desde Android 13 el sistema lo bloquea en apps
+          instaladas fuera de una tienda confiable, asi que el piloto se
+          distribuye solo por Play: un APK suelto no puede activarlo ni para
+          probar.
+        -->
+        <service
+            android:name="com.seef.checkqr.capture.listener.ServicioDeAvisosBancarios"
+            android:exported="true"
+            android:label="@string/checkqr_listener_label"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+            <!--
+              Declara que solo interesan los avisos, no el control de la barra de
+              estado, y evita pedir capacidades que no se usan.
+            -->
+            <meta-data
+                android:name="android.service.notification.default_filter_types"
+                android:value="conversations|alerting" />
+        </service>
+    </application>
+
+</manifest>

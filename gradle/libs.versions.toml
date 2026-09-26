@@ -75,6 +75,9 @@ espresso = "3.7.0"
 mockk = "1.14.11"
 turbine = "1.2.1"
 robolectric = "4.16"
+# Robolectric 4.16 solo trae SDK hasta 36, asi que los tests de JVM apuntan a 36
+# aunque la app apunte a 37. Subir cuando Robolectric publique soporte de 37.
+robolectricSdk = "36"
 
 [libraries]
 # --- AndroidX base ---

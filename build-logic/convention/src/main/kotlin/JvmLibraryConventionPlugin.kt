@@ -28,6 +28,7 @@ class JvmLibraryConventionPlugin : Plugin<Project> {
 
         tasks.withType(org.gradle.api.tasks.testing.Test::class.java).configureEach {
             useJUnit()
+            failOnNoDiscoveredTests.set(false)
         }
 
         dependencies {
