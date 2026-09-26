@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Para compartir los cuadres (PDF/CSV) por WhatsApp. -->
+<paths>
+    <cache-path
+        name="cuadres"
+        path="cuadres/" />
+</paths>
