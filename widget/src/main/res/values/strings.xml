@@ -1,0 +1,4 @@
+<resources>
+    <string name="widget_descripcion">Total cobrado hoy y últimos pagos recibidos.</string>
+    <string name="widget_nombre">CheckQr · Caja</string>
+</resources>

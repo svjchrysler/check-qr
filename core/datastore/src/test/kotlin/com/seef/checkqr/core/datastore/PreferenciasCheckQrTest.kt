@@ -42,10 +42,22 @@ class PreferenciasCheckQrTest {
     // --- Valores por omision --------------------------------------------------
 
     @Test
+    fun `el latido distingue desconocido de desconectado`() = runTest {
+        // Es la diferencia entre avisar "dejó de escuchar" y no avisarlo. Con
+        // null (nunca reporto) la app NO debe dar la alarma: el callback
+        // onListenerConnected solo llega al conectar, y si el servicio ya
+        // estaba conectado al arrancar la app, nunca llega.
+        assertNull(prefs.listenerConectado.first())
+
+        prefs.registrarLatidoListener(conectado = false, ahoraMillis = 1L)
+        assertEquals(false, prefs.listenerConectado.first())
+    }
+
+    @Test
     fun `valores por omision seguros`() = runTest {
         assertFalse("el onboarding arranca sin completar", prefs.onboardingCompletado.first())
         assertFalse("el modo discreto arranca apagado", prefs.modoDiscreto.first())
-        assertFalse("el listener arranca desconectado", prefs.listenerConectado.first())
+        assertNull("el listener arranca en desconocido, no en desconectado", prefs.listenerConectado.first())
         assertEquals(0, prefs.versionDePlantillas.first())
         assertEquals(0, prefs.pagosSinAnunciar.first())
         assertNull(prefs.cajeroActualId.first())
@@ -108,11 +120,11 @@ class PreferenciasCheckQrTest {
     @Test
     fun `registra el latido del listener`() = runTest {
         prefs.registrarLatidoListener(conectado = true, ahoraMillis = 1_234L)
-        assertTrue(prefs.listenerConectado.first())
+        assertEquals(true, prefs.listenerConectado.first())
         assertEquals(1_234L, prefs.ultimoLatidoListenerMillis.first())
 
         prefs.registrarLatidoListener(conectado = false, ahoraMillis = 5_678L)
-        assertFalse(prefs.listenerConectado.first())
+        assertEquals(false, prefs.listenerConectado.first())
         assertEquals(5_678L, prefs.ultimoLatidoListenerMillis.first())
     }
 

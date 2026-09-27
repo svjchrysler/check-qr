@@ -115,6 +115,34 @@ class DineroTest {
         )
     }
 
+    @Test
+    fun `solo los importes marcados con Bs, para texto poco fiable como el OCR`() {
+        // El caso que motivo esta funcion: el ano de la fecha es un numero
+        // valido y mayor que el cobro. Sin filtrar por el simbolo, "2026" gana
+        // sobre "Bs 50,00" y el comprobante se compara contra Bs 20,26.
+        val captura = "Yape\nPago exitoso\nBs 50.00\nPara Tienda Dona Rosa\n10 mar 2026"
+
+        assertEquals(listOf(5_000L), Dinero.importesConSimbolo(captura))
+        assertEquals(
+            "sin el filtro el ano se cuela",
+            202_600L,
+            Dinero.importes(captura).max(),
+        )
+    }
+
+    @Test
+    fun `los importes marcados aceptan las dos formas de escribir Bs`() {
+        assertEquals(
+            listOf(5_000L, 12_050L),
+            Dinero.importesConSimbolo("Comision Bs. 50,00 y total Bs 120,50"),
+        )
+    }
+
+    @Test
+    fun `sin ningun importe marcado la lista queda vacia`() {
+        assertEquals(emptyList<Long>(), Dinero.importesConSimbolo("10 mar 2026, ref 998877"))
+    }
+
     // --- Formato de salida ---------------------------------------------------
 
     @Test

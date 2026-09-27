@@ -20,6 +20,18 @@ object Dinero {
     /** Un importe suelto dentro de un texto libre. */
     private val NUMERO = Regex("""\d{1,3}(?:[.,]\d{3})+(?:[.,]\d{1,2})?|\d+(?:[.,]\d{1,2})?""")
 
+    /**
+     * Un importe que viene marcado con "Bs".
+     *
+     * Distinguirlo importa: un texto suelto trae anos, telefonos y numeros de
+     * operacion que son numeros perfectamente validos y a veces mas grandes que
+     * el cobro. El simbolo de moneda es la unica senal fiable de que un numero
+     * es dinero.
+     */
+    private val NUMERO_CON_SIMBOLO = Regex(
+        """(?i)\bBs\.?\s*(\d{1,3}(?:[.,]\d{3})+(?:[.,]\d{1,2})?|\d+(?:[.,]\d{1,2})?)""",
+    )
+
     /** Que papel juega cada separador dentro del numero. */
     private sealed interface Separadores {
         /** Numero entero: no hay parte decimal. */
@@ -129,6 +141,18 @@ object Dinero {
     fun importes(texto: String, formato: AmountFormat = AmountFormat.AUTO): List<Long> =
         NUMERO.findAll(texto)
             .mapNotNull { aCentavos(it.value, formato) }
+            .toList()
+
+    /**
+     * Solo los importes que vienen marcados con "Bs".
+     *
+     * Es lo que hay que usar sobre texto libre poco fiable, como el OCR de una
+     * captura de pantalla: sin el simbolo, la fecha "10 mar 2026" aporta un
+     * 2026 que se confundiria con Bs 20,26.
+     */
+    fun importesConSimbolo(texto: String, formato: AmountFormat = AmountFormat.AUTO): List<Long> =
+        NUMERO_CON_SIMBOLO.findAll(texto)
+            .mapNotNull { aCentavos(it.groupValues[1], formato) }
             .toList()
 
     /** Formato para pantalla, al estilo boliviano: `Bs 1.234,56`. */

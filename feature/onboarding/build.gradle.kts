@@ -9,4 +9,5 @@ android {
 dependencies {
     implementation(project(":voice"))
     implementation(project(":capture:listener"))
+    implementation(project(":core:datastore"))
 }

@@ -2,6 +2,7 @@ package com.seef.checkqr.core.data.repositorios
 
 import com.seef.checkqr.capture.parser.PlantillasBase
 import com.seef.checkqr.core.common.Reloj
+import com.seef.checkqr.core.data.permisos.AccesoAAvisos
 import com.seef.checkqr.core.database.dao.DiagnosticoDao
 import com.seef.checkqr.core.datastore.PreferenciasCheckQr
 import com.seef.checkqr.core.model.Wallet
@@ -40,6 +41,7 @@ data class SenalDeBanco(
 class RepositorioDeEstado @Inject constructor(
     private val diagnosticoDao: DiagnosticoDao,
     private val prefs: PreferenciasCheckQr,
+    private val acceso: AccesoAAvisos,
     private val reloj: Reloj,
 ) {
 
@@ -49,15 +51,21 @@ class RepositorioDeEstado @Inject constructor(
         prefs.ultimoLatidoListenerMillis,
         prefs.vozHabilitada,
         diagnosticoDao.noReconocidos(MAX_NO_RECONOCIDOS),
-    ) { senales, conectado, latido, voz, noReconocidos ->
+    ) { senales, latidoDiceConectado, latido, voz, noReconocidos ->
         val porBilletera = senales.mapNotNull { s ->
             Wallet.porId(s.walletId)?.let { w ->
                 w to SenalDeBanco(s.sourcePackage, s.ultimoAvisoMillis, s.ultimoOculto)
             }
         }.toMap()
 
+        // El permiso del sistema manda sobre el latido. `onListenerConnected`
+        // solo se dispara al conectar: si el servicio ya estaba conectado cuando
+        // la app arranco, ese callback nunca llega y el latido diria que no
+        // escucha aunque este escuchando perfectamente.
+        val escuchando = acceso.concedido() && latidoDiceConectado != false
+
         EstadoDelSistema(
-            listenerConectado = conectado,
+            listenerConectado = escuchando,
             ultimoLatidoMillis = latido,
             vozHabilitada = voz,
             ultimoAvisoPorBilletera = porBilletera,

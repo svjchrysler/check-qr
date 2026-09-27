@@ -111,9 +111,16 @@ class PreferenciasCheckQr @Inject constructor(
 
     // --- Estado del sistema ----------------------------------------------------
 
-    /** Ultima vez que el listener de notificaciones estuvo conectado. */
-    val listenerConectado: Flow<Boolean> =
-        store.data.map { it[Claves.LISTENER_CONECTADO] ?: false }
+    /**
+     * Lo ultimo que reporto el listener, o null si nunca reporto nada.
+     *
+     * El tercer estado es necesario: `onListenerConnected` solo se dispara al
+     * conectar, asi que tras un arranque de la app con el servicio ya conectado
+     * no llega ningun callback. Si null significara "desconectado", la app
+     * avisaria "dejó de escuchar" justo cuando todo funciona.
+     */
+    val listenerConectado: Flow<Boolean?> =
+        store.data.map { it[Claves.LISTENER_CONECTADO] }
 
     val ultimoLatidoListenerMillis: Flow<Long> =
         store.data.map { it[Claves.ULTIMO_LATIDO_LISTENER] ?: 0L }
