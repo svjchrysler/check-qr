@@ -7,151 +7,151 @@ import androidx.compose.ui.graphics.Color
 /**
  * Paleta de CheckQr.
  *
- * El verde no es decorativo: es el color del pago que entro, que es la
- * informacion que el comerciante busca de un vistazo desde el otro lado del
- * mostrador. El rojo queda reservado para el nivel 🔴 "no llegó" y para "dejó de
- * escuchar", y no se usa para nada mas, para que cuando aparezca signifique una
- * sola cosa.
+ * Minimalista a proposito: la pantalla es casi toda blanco y negro, y el color
+ * aparece solo cuando significa algo.
  *
- * **Estan definidos los 30 roles de Material, no solo los que se usan a
- * diario.** Es necesario: cualquier rol que se deje sin definir cae al morado
- * por omision de Material, y basta con que un componente lo use — la barra de
- * navegacion usa `surfaceContainer`, los botones tonales usan
- * `secondaryContainer` — para que aparezca lila en medio de una app verde.
+ * - **Verde**: dinero que entro, y nada mas. El total del dia, el "sí llegó" de
+ *   la verificacion y el indicador de que la app esta escuchando.
+ * - **Rojo**: solo el nivel 🔴 "no llegó" y "dejó de escuchar".
+ * - **Ambar**: cosas para revisar que no son urgentes.
+ * - Todo lo demas es neutro.
+ *
+ * La razon es practica, no estetica. Si el verde esta en el total, en el boton,
+ * en cada monto de la lista y en los iconos, deja de querer decir nada; y esta
+ * es una app donde el comerciante tiene que poder distinguir de un vistazo "todo
+ * bien" de "revisa esto".
+ *
+ * Estan definidos los 30 roles de Material y no solo los de uso diario:
+ * cualquier rol sin definir cae al morado por omision, y basta con que un
+ * componente lo use — la barra de navegacion usa `surfaceContainer`, los botones
+ * tonales usan `secondaryContainer` — para que aparezca lila en medio de todo.
  */
 
-// --- Tema claro -----------------------------------------------------------
+// --- Tema claro -------------------------------------------------------------
 
-private val verde40 = Color(0xFF00701F)
-private val verde90 = Color(0xFFB7F3BE)
-private val verde10 = Color(0xFF002204)
+/** Verde profundo, apagado. Un verde brillante cansa en una pantalla que se mira todo el dia. */
+private val verde = Color(0xFF0A6B45)
+private val verdeSuave = Color(0xFFE4F1EA)
+private val verdeProfundo = Color(0xFF042A1A)
 
-private val salvia40 = Color(0xFF52634F)
-private val salvia90 = Color(0xFFD4E8CE)
-private val salvia10 = Color(0xFF101F10)
+/** Neutros: la base real de la interfaz. */
+private val tinta = Color(0xFF101312)
+private val tintaSuave = Color(0xFF6B706D)
+private val blanco = Color(0xFFFFFFFF)
+private val casiBlanco = Color(0xFFFAFBFA)
+private val gris5 = Color(0xFFF4F6F4)
+private val gris10 = Color(0xFFEDEFEE)
+private val gris15 = Color(0xFFE6E9E7)
+private val linea = Color(0xFFE2E5E3)
 
-private val ambar40 = Color(0xFF7A5900)
-private val ambar90 = Color(0xFFFFDF95)
-private val ambar10 = Color(0xFF261A00)
+private val ambar = Color(0xFF8A6400)
+private val ambarSuave = Color(0xFFFBEFD3)
+private val ambarProfundo = Color(0xFF2B1F00)
 
-private val rojo40 = Color(0xFFB3261E)
-private val rojo90 = Color(0xFFF9DEDC)
-private val rojo10 = Color(0xFF410E0B)
-
-private val neutro10 = Color(0xFF1A1C19)
-private val neutro20 = Color(0xFF2F312D)
-private val neutro90 = Color(0xFFE2E3DD)
-private val neutro95 = Color(0xFFF0F1EB)
-private val neutro98 = Color(0xFFFCFDF6)
+private val rojo = Color(0xFFB3261E)
+private val rojoSuave = Color(0xFFFBEAE8)
+private val rojoProfundo = Color(0xFF410E0B)
 
 internal val esquemaClaro = lightColorScheme(
-    primary = verde40,
-    onPrimary = Color.White,
-    primaryContainer = verde90,
-    onPrimaryContainer = verde10,
+    primary = verde,
+    onPrimary = blanco,
+    primaryContainer = verdeSuave,
+    onPrimaryContainer = verdeProfundo,
 
-    secondary = salvia40,
-    onSecondary = Color.White,
-    secondaryContainer = salvia90,
-    onSecondaryContainer = salvia10,
+    // El secundario es neutro: los botones tonales tienen que verse como
+    // acciones discretas, no como una segunda marca de color.
+    secondary = Color(0xFF3F4441),
+    onSecondary = blanco,
+    secondaryContainer = gris10,
+    onSecondaryContainer = Color(0xFF2A2E2C),
 
-    tertiary = ambar40,
-    onTertiary = Color.White,
-    tertiaryContainer = ambar90,
-    onTertiaryContainer = ambar10,
+    tertiary = ambar,
+    onTertiary = blanco,
+    tertiaryContainer = ambarSuave,
+    onTertiaryContainer = ambarProfundo,
 
-    error = rojo40,
-    onError = Color.White,
-    errorContainer = rojo90,
-    onErrorContainer = rojo10,
+    error = rojo,
+    onError = blanco,
+    errorContainer = rojoSuave,
+    onErrorContainer = rojoProfundo,
 
-    background = neutro98,
-    onBackground = neutro10,
-    surface = neutro98,
-    onSurface = neutro10,
-    surfaceVariant = Color(0xFFDDE5D9),
-    onSurfaceVariant = Color(0xFF414941),
+    background = blanco,
+    onBackground = tinta,
+    surface = blanco,
+    onSurface = tinta,
+    surfaceVariant = gris5,
+    onSurfaceVariant = tintaSuave,
 
-    // Los tonos de superficie que usan la barra de navegacion, las tarjetas
-    // elevadas y las hojas. Sin definirlos, la barra inferior sale lila.
-    surfaceContainerLowest = Color.White,
-    surfaceContainerLow = neutro98,
-    surfaceContainer = neutro95,
-    surfaceContainerHigh = Color(0xFFEAEBE5),
-    surfaceContainerHighest = Color(0xFFE4E5DF),
-    surfaceDim = Color(0xFFDBDDD7),
-    surfaceBright = neutro98,
+    surfaceContainerLowest = blanco,
+    surfaceContainerLow = casiBlanco,
+    surfaceContainer = gris5,
+    surfaceContainerHigh = gris10,
+    surfaceContainerHighest = gris15,
+    surfaceDim = gris10,
+    surfaceBright = blanco,
 
-    outline = Color(0xFF717970),
-    outlineVariant = Color(0xFFC1C9BE),
+    outline = Color(0xFF9AA09D),
+    outlineVariant = linea,
 
-    inverseSurface = neutro20,
-    inverseOnSurface = neutro95,
-    inversePrimary = Color(0xFF7BF08E),
+    inverseSurface = tinta,
+    inverseOnSurface = casiBlanco,
+    inversePrimary = Color(0xFF6FD3A0),
 
-    scrim = Color.Black,
+    scrim = Color(0xFF000000),
 )
 
-// --- Tema oscuro ------------------------------------------------------------
+// --- Tema oscuro -------------------------------------------------------------
 
-private val verde80 = Color(0xFF7BF08E)
-private val verde30 = Color(0xFF005318)
-private val verde20 = Color(0xFF003910)
+private val verdeClaro = Color(0xFF6FD3A0)
+private val verdeOscuro = Color(0xFF0B4A30)
 
-private val salvia80 = Color(0xFFB9CCB4)
-private val salvia30 = Color(0xFF3A4B38)
-private val salvia20 = Color(0xFF243424)
-
-private val ambar80 = Color(0xFFFFDF95)
-private val ambar30 = Color(0xFF5C4200)
-private val ambar20 = Color(0xFF3F2E00)
-
-private val rojo80 = Color(0xFFFFB4AB)
-private val rojo30 = Color(0xFF93000A)
-private val rojo20 = Color(0xFF690005)
+private val fondoOscuro = Color(0xFF0C0E0D)
+private val tintaClara = Color(0xFFE6E8E7)
+private val tintaClaraSuave = Color(0xFF9AA09D)
+private val lineaOscura = Color(0xFF272B29)
 
 internal val esquemaOscuro = darkColorScheme(
-    primary = verde80,
-    onPrimary = verde20,
-    primaryContainer = verde30,
-    onPrimaryContainer = Color(0xFF96FFA8),
+    primary = verdeClaro,
+    onPrimary = Color(0xFF00301C),
+    primaryContainer = verdeOscuro,
+    onPrimaryContainer = Color(0xFF8FEFBC),
 
-    secondary = salvia80,
-    onSecondary = salvia20,
-    secondaryContainer = salvia30,
-    onSecondaryContainer = Color(0xFFD4E8CE),
+    secondary = Color(0xFFBFC5C1),
+    onSecondary = Color(0xFF283029),
+    secondaryContainer = Color(0xFF212523),
+    onSecondaryContainer = Color(0xFFDDE2DF),
 
-    tertiary = ambar80,
-    onTertiary = ambar20,
-    tertiaryContainer = ambar30,
-    onTertiaryContainer = Color(0xFFFFDF95),
+    tertiary = Color(0xFFF0CE84),
+    onTertiary = Color(0xFF3A2C00),
+    tertiaryContainer = Color(0xFF2E2413),
+    onTertiaryContainer = Color(0xFFF7E2B4),
 
-    error = rojo80,
-    onError = rojo20,
-    errorContainer = rojo30,
-    onErrorContainer = Color(0xFFFFDAD6),
+    error = Color(0xFFF2B8B5),
+    onError = Color(0xFF601410),
+    errorContainer = Color(0xFF362220),
+    onErrorContainer = Color(0xFFF9DEDC),
 
-    background = Color(0xFF12140F),
-    onBackground = neutro90,
-    surface = Color(0xFF12140F),
-    onSurface = neutro90,
-    surfaceVariant = Color(0xFF414941),
-    onSurfaceVariant = Color(0xFFC1C9BE),
+    background = fondoOscuro,
+    onBackground = tintaClara,
+    surface = fondoOscuro,
+    onSurface = tintaClara,
+    surfaceVariant = Color(0xFF161918),
+    onSurfaceVariant = tintaClaraSuave,
 
-    surfaceContainerLowest = Color(0xFF0C0F0A),
-    surfaceContainerLow = Color(0xFF1A1C19),
-    surfaceContainer = Color(0xFF1E201C),
-    surfaceContainerHigh = Color(0xFF282B26),
-    surfaceContainerHighest = Color(0xFF333630),
-    surfaceDim = Color(0xFF12140F),
-    surfaceBright = Color(0xFF383A34),
+    surfaceContainerLowest = Color(0xFF070908),
+    surfaceContainerLow = Color(0xFF111413),
+    surfaceContainer = Color(0xFF161918),
+    surfaceContainerHigh = Color(0xFF1D2120),
+    surfaceContainerHighest = Color(0xFF252927),
+    surfaceDim = fondoOscuro,
+    surfaceBright = Color(0xFF2A2E2C),
 
-    outline = Color(0xFF8B938A),
-    outlineVariant = Color(0xFF414941),
+    outline = Color(0xFF6B706D),
+    outlineVariant = lineaOscura,
 
-    inverseSurface = neutro90,
-    inverseOnSurface = neutro20,
-    inversePrimary = verde40,
+    inverseSurface = tintaClara,
+    inverseOnSurface = Color(0xFF1D2120),
+    inversePrimary = verde,
 
-    scrim = Color.Black,
+    scrim = Color(0xFF000000),
 )

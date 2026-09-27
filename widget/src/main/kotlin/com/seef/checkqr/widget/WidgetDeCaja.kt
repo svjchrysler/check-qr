@@ -29,6 +29,7 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import com.seef.checkqr.core.common.Dinero
+import com.seef.checkqr.core.common.Plural
 import com.seef.checkqr.core.model.Payment
 
 /**
@@ -120,7 +121,7 @@ class WidgetDeCaja : GlanceAppWidget() {
             ) {
                 Column(modifier = GlanceModifier.defaultWeight()) {
                     Text(
-                        text = "Hoy · ${datos.cantidad} pagos",
+                        text = "Hoy · " + Plural.pagos(datos.cantidad),
                         style = TextStyle(fontSize = 12.sp(), color = GlanceTheme.colors.onSurfaceVariant),
                     )
                     Text(

@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CloseFullscreen
-import androidx.compose.material.icons.outlined.HourglassEmpty
+import com.seef.checkqr.core.designsystem.Iconos
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
@@ -41,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.seef.checkqr.core.common.Calendario
 import com.seef.checkqr.core.common.Dinero
+import com.seef.checkqr.core.common.Plural
 import com.seef.checkqr.core.designsystem.componentes.AvatarDeBilletera
 import com.seef.checkqr.core.designsystem.componentes.MONTO_OCULTO
 import com.seef.checkqr.core.designsystem.theme.Espaciado
@@ -106,7 +108,9 @@ internal fun Mostrador(
 
             Box(
                 modifier = Modifier.weight(1f).fillMaxWidth(),
-                contentAlignment = Alignment.Center,
+                // Un poco por encima del centro geometrico: con el resumen ligero
+                // de arriba, el centro exacto se percibe bajo.
+                contentAlignment = BiasAlignment(0f, -0.15f),
             ) {
                 AnimatedContent(
                     targetState = ultimo,
@@ -153,13 +157,12 @@ private fun ResumenSuperior(ui: UiCaja, onSalir: () -> Unit) {
                     Dinero.formatear(ui.totalDeHoyCentavos)
                 },
                 style = TipografiaMostrador.total,
-                color = MaterialTheme.colorScheme.primary,
+                // Neutro a proposito: el verde se reserva para el cobro que acaba
+                // de entrar, que es lo unico que tiene que tirar del ojo aqui.
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
-                text = when (ui.pagosDeHoy.size) {
-                    1 -> "1 pago"
-                    else -> "${ui.pagosDeHoy.size} pagos"
-                },
+                text = Plural.pagos(ui.pagosDeHoy.size),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -242,7 +245,7 @@ private fun Esperando() {
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                imageVector = Icons.Outlined.HourglassEmpty,
+                imageVector = Iconos.esperando,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(32.dp),

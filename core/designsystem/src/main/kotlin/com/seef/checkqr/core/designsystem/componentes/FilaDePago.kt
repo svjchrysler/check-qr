@@ -102,7 +102,7 @@ fun FilaDePago(
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
-                text = pagador ?: "Sin nombre del pagador",
+                text = pagador ?: "Sin nombre",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,

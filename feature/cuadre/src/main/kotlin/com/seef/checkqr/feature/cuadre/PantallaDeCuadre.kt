@@ -17,8 +17,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Description
-import androidx.compose.material.icons.outlined.Receipt
 import androidx.compose.material.icons.outlined.TableChart
+import com.seef.checkqr.core.designsystem.Iconos
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,6 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.seef.checkqr.core.common.Calendario
 import com.seef.checkqr.core.common.Dinero
+import com.seef.checkqr.core.common.Plural
 import com.seef.checkqr.core.designsystem.componentes.Aviso
 import com.seef.checkqr.core.designsystem.componentes.BarraSuperior
 import com.seef.checkqr.core.designsystem.componentes.EncabezadoDeSeccion
@@ -44,7 +45,7 @@ import com.seef.checkqr.core.designsystem.componentes.EstadoVacio
 import com.seef.checkqr.core.designsystem.componentes.FilaDePago
 import com.seef.checkqr.core.designsystem.componentes.NivelDeAviso
 import com.seef.checkqr.core.designsystem.componentes.SeparadorDeLista
-import com.seef.checkqr.core.designsystem.componentes.TarjetaDeTotal
+import com.seef.checkqr.core.designsystem.componentes.TotalDelDia
 import com.seef.checkqr.core.designsystem.theme.Espaciado
 import com.seef.checkqr.core.designsystem.theme.Medidas
 import com.seef.checkqr.core.designsystem.theme.Montos
@@ -94,11 +95,14 @@ fun PantallaDeCuadre(
 
             item {
                 Column(modifier = Modifier.padding(horizontal = Espaciado.estandar)) {
-                    TarjetaDeTotal(
+                    Spacer(Modifier.height(Espaciado.corto))
+                    TotalDelDia(
                         totalCentavos = c.totalCentavos,
                         cantidadDePagos = c.cantidad,
-                        cajaAbierta = false,
                         etiqueta = "Total del día",
+                        // Un dia que ya paso no "acaba de entrar": la cifra
+                        // aparece puesta, sin contar.
+                        animar = false,
                     )
                 }
             }
@@ -122,7 +126,7 @@ fun PantallaDeCuadre(
             if (c.cantidad == 0) {
                 item {
                     EstadoVacio(
-                        icono = Icons.Outlined.Receipt,
+                        icono = Iconos.cuadre,
                         titulo = "Sin pagos este día",
                         detalle = "Usa las flechas de arriba para ver otro día.",
                     )
@@ -257,7 +261,7 @@ private fun LazyListScope.bloque(titulo: String, renglones: List<RenglonDeCuadre
                             Column {
                                 Text(r.etiqueta, style = MaterialTheme.typography.bodyLarge)
                                 Text(
-                                    text = if (r.cantidad == 1) "1 pago" else "${r.cantidad} pagos",
+                                    text = Plural.pagos(r.cantidad),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )

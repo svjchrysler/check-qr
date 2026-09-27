@@ -17,10 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.ErrorOutline
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.WarningAmber
+import com.seef.checkqr.core.designsystem.Iconos
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -168,7 +165,7 @@ private fun ResumenPlegable(avisos: List<AvisoPendiente>) {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.WarningAmber,
+                    imageVector = Iconos.atencion,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.tertiary,
                     modifier = Modifier.size(20.dp),
@@ -245,9 +242,9 @@ private fun NivelDeAviso.sobreContenedor(): Color = when (this) {
 }
 
 private fun NivelDeAviso.icono(): ImageVector = when (this) {
-    NivelDeAviso.INFORMATIVO -> Icons.Outlined.Info
-    NivelDeAviso.ATENCION -> Icons.Outlined.WarningAmber
-    NivelDeAviso.PROBLEMA -> Icons.Outlined.ErrorOutline
+    NivelDeAviso.INFORMATIVO -> Iconos.informacion
+    NivelDeAviso.ATENCION -> Iconos.atencion
+    NivelDeAviso.PROBLEMA -> Iconos.problema
 }
 
 /** Confirmacion breve, para cuando algo salio bien. */
@@ -264,7 +261,7 @@ fun AvisoDeExito(titulo: String, modifier: Modifier = Modifier, detalle: String?
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = Icons.Outlined.CheckCircle,
+                imageVector = Iconos.correcto,
                 contentDescription = null,
                 modifier = Modifier.size(20.dp),
             )

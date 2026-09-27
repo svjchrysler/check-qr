@@ -79,7 +79,7 @@ fun BarraSuperior(
                         }
                     },
                 ) {
-                    PuntoDeEstado(escuchando)
+                    PuntoDeEscucha(escuchando)
                 }
             }
         },
@@ -87,30 +87,6 @@ fun BarraSuperior(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
     )
-}
-
-/**
- * El punto que dice si la app esta escuchando.
- *
- * Con descripcion para lectores de pantalla, porque el color por si solo no
- * comunica nada a quien no lo ve.
- */
-@Composable
-fun PuntoDeEstado(escuchando: Boolean, modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .size(12.dp)
-            .clip(CircleShape)
-            .background(
-                if (escuchando) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.error
-                },
-            ),
-    )
-    // La descripcion la pone el IconButton que lo contiene: asi el lector de
-    // pantalla anuncia una sola cosa en lugar de un boton y un punto sueltos.
 }
 
 /** Titulo de una seccion dentro de una lista. */

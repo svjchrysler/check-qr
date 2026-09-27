@@ -2,15 +2,10 @@ package com.seef.checkqr.navegacion
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Groups
-import androidx.compose.material.icons.filled.MonitorHeart
-import androidx.compose.material.icons.filled.PointOfSale
-import androidx.compose.material.icons.filled.QrCodeScanner
-import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
+import com.seef.checkqr.core.designsystem.Iconos
 import com.seef.checkqr.feature.caja.PantallaDeCaja
 import com.seef.checkqr.feature.caja.PantallaDeMostrador
 import com.seef.checkqr.feature.caja.PantallaDeEstado
@@ -42,12 +38,19 @@ import com.seef.checkqr.feature.verificar.PantallaDeVerificar
  * esconder justamente lo que el comerciante necesita encontrar rapido el dia que
  * deja de escuchar sus pagos.
  */
-enum class Destino(val ruta: String, val etiqueta: String, val icono: ImageVector) {
-    CAJA("caja", "Caja", Icons.Default.PointOfSale),
-    VERIFICAR("verificar", "Verificar", Icons.Default.QrCodeScanner),
-    CUADRE("cuadre", "Cuadre", Icons.Default.Receipt),
-    EQUIPO("equipo", "Equipo", Icons.Default.Groups),
-    ESTADO("estado", "Estado", Icons.Default.MonitorHeart),
+enum class Destino(
+    val ruta: String,
+    val etiqueta: String,
+    /** Contorneado cuando la pestana no esta activa. */
+    val icono: ImageVector,
+    /** Relleno cuando si lo esta: es el patron con el que la gente lee "estoy aqui". */
+    val iconoActivo: ImageVector,
+) {
+    CAJA("caja", "Caja", Iconos.caja, Iconos.cajaActiva),
+    VERIFICAR("verificar", "Verificar", Iconos.verificar, Iconos.verificarActiva),
+    CUADRE("cuadre", "Cuadre", Iconos.cuadre, Iconos.cuadreActiva),
+    EQUIPO("equipo", "Equipo", Iconos.equipo, Iconos.equipoActiva),
+    ESTADO("estado", "Estado", Iconos.estado, Iconos.estadoActiva),
 }
 
 /**
@@ -87,8 +90,24 @@ fun NavegacionDeCheckQr(modifier: Modifier = Modifier) {
                                 restoreState = true
                             }
                         },
-                        icon = { Icon(destino.icono, contentDescription = null) },
+                        icon = {
+                            Icon(
+                                imageVector = if (seleccionado) {
+                                    destino.iconoActivo
+                                } else {
+                                    destino.icono
+                                },
+                                contentDescription = null,
+                            )
+                        },
                         label = { Text(destino.etiqueta) },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                            indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
                     )
                 }
             }

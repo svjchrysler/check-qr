@@ -39,19 +39,31 @@ val tipografia = Typography().let { base ->
  * temblorosa.
  */
 object Montos {
-    /** El total del dia, en la tarjeta principal. */
+    /**
+     * El total del dia.
+     *
+     * Grande de verdad: es lo unico de la pantalla que se tiene que poder leer
+     * sin acercarse, y ya no esta dentro de una tarjeta de color que lo separe
+     * del resto, asi que el tamano es lo que le da la jerarquia.
+     */
     val destacado = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Bold,
-        fontSize = 40.sp,
-        lineHeight = 46.sp,
+        fontSize = 46.sp,
+        lineHeight = 52.sp,
+        letterSpacing = (-1).sp,
     )
 
-    /** El monto de una fila de la lista. */
+    /**
+     * El monto de una fila de la lista.
+     *
+     * SemiBold y no Bold: en una lista de veinte filas, el negrita completo se
+     * vuelve una mancha y deja de destacar nada.
+     */
     val fila = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Bold,
-        fontSize = 20.sp,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 19.sp,
         lineHeight = 24.sp,
     )
 

@@ -25,7 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.seef.checkqr.core.common.Calendario
+import com.seef.checkqr.core.common.Plural
 import com.seef.checkqr.core.data.repositorios.SenalDeBanco
+import com.seef.checkqr.core.designsystem.Iconos
 import com.seef.checkqr.core.designsystem.componentes.AvatarDeBilletera
 import com.seef.checkqr.core.designsystem.componentes.Aviso
 import com.seef.checkqr.core.designsystem.componentes.AvisoDeExito
@@ -105,7 +107,11 @@ fun PantallaDeEstado(
                     }
                     if (sistema.avisosNoReconocidos > 0) {
                         Aviso(
-                            titulo = "${sistema.avisosNoReconocidos} avisos no reconocidos",
+                            titulo = Plural.contar(
+                                sistema.avisosNoReconocidos,
+                                "aviso no reconocido",
+                                "avisos no reconocidos",
+                            ),
                             detalle = "Llegaron avisos de una app de banco que CheckQr no " +
                                 "supo leer. Suele significar que el banco cambió el formato " +
                                 "de sus mensajes.",
@@ -150,10 +156,16 @@ fun PantallaDeEstado(
                     ),
                 ) {
                     Aviso(
-                        titulo = "${sistema.billeterasSinSenal.size} billeteras sin ninguna señal",
+                        titulo = Plural.contar(
+                            sistema.billeterasSinSenal.size,
+                            "billetera sin ninguna señal",
+                            "billeteras sin ninguna señal",
+                        ),
                         detalle = "Nunca llegó un aviso de " +
                             sistema.billeterasSinSenal.joinToString { it.nombreVisible } +
-                            ". Puede ser que no las uses, o que CheckQr no reconozca su app.",
+                            ". Puede ser que no " +
+                            Plural.palabra(sistema.billeterasSinSenal.size, "la uses", "las uses") +
+                            ", o que CheckQr no reconozca su app.",
                         nivel = NivelDeAviso.INFORMATIVO,
                     )
                 }
