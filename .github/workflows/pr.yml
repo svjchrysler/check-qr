@@ -25,21 +25,21 @@ jobs:
     timeout-minutes: 30
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # El wrapper es un binario versionado que CI ejecuta con los permisos del
       # repositorio. Esto comprueba que su checksum es el de una distribucion
       # oficial de Gradle antes de correrlo.
-      - uses: gradle/actions/wrapper-validation@v4
+      - uses: gradle/actions/wrapper-validation@v6
 
       - name: Preparar JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '21'
 
       - name: Preparar Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
         with:
           # Solo el PR lee de la cache; escribirla desde cada rama la llena de
           # entradas que nadie reutiliza. La rama por defecto es la que la
@@ -49,10 +49,16 @@ jobs:
       # compileSdk es 37 y es reciente: el runner no siempre lo trae. Instalarlo
       # explicitamente evita depender de que la imagen de GitHub lo incluya, y
       # si ya esta el paso no hace nada.
+      #
+      # El id lleva la version menor. Android 17 publica las plataformas como
+      # android-37.0, .1 y .2, y no existe ningun `platforms;android-37` a
+      # secas: pedirlo asi falla con "Failed to find package". AGP resuelve
+      # `compileSdk = 37` contra la .0, que es la que se instala aqui.
       - name: Instalar la plataforma Android 37
         run: |
-          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37"
+          sdkmanager="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$sdkmanager" --licenses > /dev/null 2>&1 || true
+          "$sdkmanager" "platforms;android-37.0"
 
       # `test` y no `testDebugUnitTest`: los tres modulos de Kotlin puro
       # —core:model, core:common y capture:parser— no tienen variantes, y con la
@@ -69,7 +75,7 @@ jobs:
       # cuando de verdad hace falta.
       - name: Guardar los informes
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: informes-android
           path: |
@@ -85,9 +91,9 @@ jobs:
     # El backend es Go y no comparte nada con el build de Gradle, asi que corre
     # en paralelo. Un PR que solo toca Kotlin lo atraviesa en segundos.
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v7
         with:
           go-version: '1.27'
           cache-dependency-path: server/go.sum
