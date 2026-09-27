@@ -1,5 +1,6 @@
 package com.seef.checkqr.core.designsystem.componentes
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
@@ -27,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
@@ -58,9 +60,14 @@ fun BotonDeCaja(
     // el boton mientras sigue atendiendo al cliente.
     val haptica = LocalHapticFeedback.current
 
+    // Con la caja abierta el boton se vacia y le sale un borde, en vez de
+    // quedarse relleno de gris. Un relleno claro con texto oscuro es
+    // exactamente el aspecto que Material le da a un boton desactivado, asi que
+    // "Cerrar caja" parecia no se podia tocar. El borde es lo que lo desmiente:
+    // un boton desactivado nunca lo lleva.
     val contenedor by animateColorAsState(
         targetValue = if (abierta) {
-            MaterialTheme.colorScheme.surfaceContainer
+            Color.Transparent
         } else {
             MaterialTheme.colorScheme.primary
         },
@@ -76,6 +83,15 @@ fun BotonDeCaja(
         animationSpec = tween(Duraciones.CORTA),
         label = "texto del boton de caja",
     )
+    val borde by animateColorAsState(
+        targetValue = if (abierta) {
+            MaterialTheme.colorScheme.outline
+        } else {
+            Color.Transparent
+        },
+        animationSpec = tween(Duraciones.CORTA),
+        label = "borde del boton de caja",
+    )
 
     Button(
         onClick = {
@@ -84,6 +100,7 @@ fun BotonDeCaja(
         },
         enabled = habilitado,
         shape = MaterialTheme.shapes.large,
+        border = BorderStroke(1.dp, borde),
         colors = ButtonDefaults.buttonColors(
             containerColor = contenedor,
             contentColor = contenido,
@@ -136,35 +153,17 @@ fun AccionesDeCaja(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(Espaciado.medio),
     ) {
-        AccionSecundaria(
+        BotonSecundario(
             texto = "Mostrador",
             icono = Icons.Outlined.Fullscreen,
             onClick = onMostrador,
             modifier = Modifier.weight(1f),
         )
-        AccionSecundaria(
+        BotonSecundario(
             texto = if (discreto) "Mostrar" else "Ocultar",
             icono = if (discreto) Icons.Outlined.Visibility else Iconos.ocultar,
             onClick = onAlternarDiscreto,
             modifier = Modifier.weight(1f),
         )
-    }
-}
-
-@Composable
-private fun AccionSecundaria(
-    texto: String,
-    icono: androidx.compose.ui.graphics.vector.ImageVector,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    OutlinedButton(
-        onClick = onClick,
-        shape = MaterialTheme.shapes.medium,
-        modifier = modifier.height(Medidas.objetivoTactil),
-    ) {
-        Icon(imageVector = icono, contentDescription = null, modifier = Modifier.size(18.dp))
-        Spacer(Modifier.size(Espaciado.corto))
-        Text(texto, style = MaterialTheme.typography.labelLarge)
     }
 }

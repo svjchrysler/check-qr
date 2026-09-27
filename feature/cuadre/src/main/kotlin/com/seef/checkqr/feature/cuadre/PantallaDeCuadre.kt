@@ -19,7 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.TableChart
 import com.seef.checkqr.core.designsystem.Iconos
-import androidx.compose.material3.OutlinedButton
+import com.seef.checkqr.core.designsystem.componentes.BotonSecundario
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.HorizontalDivider
@@ -147,32 +147,18 @@ fun PantallaDeCuadre(
                     ),
                 horizontalArrangement = Arrangement.spacedBy(Espaciado.medio),
             ) {
-                OutlinedButton(
+                BotonSecundario(
+                    texto = "PDF",
+                    icono = Icons.Outlined.Description,
                     onClick = { compartir(FormatoDeExportacion.PDF) },
-                    shape = MaterialTheme.shapes.medium,
-                    modifier = Modifier.weight(1f).height(Medidas.objetivoTactil),
-                ) {
-                    Icon(
-                        Icons.Outlined.Description,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                    )
-                    Spacer(Modifier.width(Espaciado.corto))
-                    Text("PDF")
-                }
-                OutlinedButton(
+                    modifier = Modifier.weight(1f),
+                )
+                BotonSecundario(
+                    texto = "Excel",
+                    icono = Icons.Outlined.TableChart,
                     onClick = { compartir(FormatoDeExportacion.CSV) },
-                    shape = MaterialTheme.shapes.medium,
-                    modifier = Modifier.weight(1f).height(Medidas.objetivoTactil),
-                ) {
-                    Icon(
-                        Icons.Outlined.TableChart,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                    )
-                    Spacer(Modifier.width(Espaciado.corto))
-                    Text("Excel")
-                }
+                    modifier = Modifier.weight(1f),
+                )
             }
         }
 
