@@ -69,7 +69,7 @@ fun Aviso(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
+        shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
             containerColor = nivel.contenedor(),
             contentColor = nivel.sobreContenedor(),
@@ -152,9 +152,11 @@ private fun ResumenPlegable(avisos: List<AvisoPendiente>) {
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        shape = MaterialTheme.shapes.large,
+        // Tinte ambar y no gris: sobre un fondo gris, una tira gris no se lee
+        // como aviso ni como tarjeta, se lee como un hueco.
+        color = MaterialTheme.colorScheme.tertiaryContainer,
+        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
     ) {
         Column {
             Row(
@@ -167,7 +169,7 @@ private fun ResumenPlegable(avisos: List<AvisoPendiente>) {
                 Icon(
                     imageVector = Iconos.atencion,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.tertiary,
+                    tint = MaterialTheme.colorScheme.onTertiaryContainer,
                     modifier = Modifier.size(20.dp),
                 )
                 Spacer(Modifier.size(Espaciado.medio))
@@ -229,7 +231,7 @@ private fun ResumenPlegable(avisos: List<AvisoPendiente>) {
 
 @Composable
 private fun NivelDeAviso.contenedor(): Color = when (this) {
-    NivelDeAviso.INFORMATIVO -> MaterialTheme.colorScheme.surfaceVariant
+    NivelDeAviso.INFORMATIVO -> MaterialTheme.colorScheme.surfaceContainerLowest
     NivelDeAviso.ATENCION -> MaterialTheme.colorScheme.tertiaryContainer
     NivelDeAviso.PROBLEMA -> MaterialTheme.colorScheme.errorContainer
 }

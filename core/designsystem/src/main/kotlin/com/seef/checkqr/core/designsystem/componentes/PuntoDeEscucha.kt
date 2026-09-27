@@ -37,9 +37,14 @@ fun PuntoDeEscucha(
     escuchando: Boolean,
     modifier: Modifier = Modifier,
     tamano: androidx.compose.ui.unit.Dp = 10.dp,
+    /**
+     * Color del punto cuando escucha. Sobre la cabecera verde hay que pasarle
+     * blanco: el verde de "escuchando" desapareceria contra su propio fondo.
+     */
+    colorActivo: androidx.compose.ui.graphics.Color? = null,
 ) {
     val color = if (escuchando) {
-        MaterialTheme.colorScheme.primary
+        colorActivo ?: MaterialTheme.colorScheme.primary
     } else {
         MaterialTheme.colorScheme.error
     }

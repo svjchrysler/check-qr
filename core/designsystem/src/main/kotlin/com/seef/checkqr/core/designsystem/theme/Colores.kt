@@ -75,19 +75,22 @@ internal val esquemaClaro = lightColorScheme(
     errorContainer = rojoSuave,
     onErrorContainer = rojoProfundo,
 
-    background = blanco,
+    // El fondo es gris claro y las tarjetas blancas. Es lo que hace que una
+    // tarjeta se lea como tarjeta: con fondo blanco y tarjeta blanca no hay
+    // contraste, la sombra sola no alcanza y la pantalla se ve plana.
+    background = gris5,
     onBackground = tinta,
-    surface = blanco,
+    surface = gris5,
     onSurface = tinta,
-    surfaceVariant = gris5,
+    surfaceVariant = gris10,
     onSurfaceVariant = tintaSuave,
 
     surfaceContainerLowest = blanco,
     surfaceContainerLow = casiBlanco,
-    surfaceContainer = gris5,
-    surfaceContainerHigh = gris10,
-    surfaceContainerHighest = gris15,
-    surfaceDim = gris10,
+    surfaceContainer = gris10,
+    surfaceContainerHigh = gris15,
+    surfaceContainerHighest = Color(0xFFDFE2E0),
+    surfaceDim = gris15,
     surfaceBright = blanco,
 
     outline = Color(0xFF9AA09D),
@@ -135,10 +138,11 @@ internal val esquemaOscuro = darkColorScheme(
     onBackground = tintaClara,
     surface = fondoOscuro,
     onSurface = tintaClara,
-    surfaceVariant = Color(0xFF161918),
+    surfaceVariant = Color(0xFF1D2120),
     onSurfaceVariant = tintaClaraSuave,
 
-    surfaceContainerLowest = Color(0xFF070908),
+    // En oscuro las tarjetas van MAS claras que el fondo, no mas oscuras.
+    surfaceContainerLowest = Color(0xFF181B1A),
     surfaceContainerLow = Color(0xFF111413),
     surfaceContainer = Color(0xFF161918),
     surfaceContainerHigh = Color(0xFF1D2120),

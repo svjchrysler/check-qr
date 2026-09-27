@@ -19,12 +19,11 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.TableChart
 import com.seef.checkqr.core.designsystem.Iconos
-import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,13 +38,12 @@ import com.seef.checkqr.core.common.Calendario
 import com.seef.checkqr.core.common.Dinero
 import com.seef.checkqr.core.common.Plural
 import com.seef.checkqr.core.designsystem.componentes.Aviso
-import com.seef.checkqr.core.designsystem.componentes.BarraSuperior
+import com.seef.checkqr.core.designsystem.componentes.CabeceraDeMarca
 import com.seef.checkqr.core.designsystem.componentes.EncabezadoDeSeccion
 import com.seef.checkqr.core.designsystem.componentes.EstadoVacio
 import com.seef.checkqr.core.designsystem.componentes.FilaDePago
 import com.seef.checkqr.core.designsystem.componentes.NivelDeAviso
 import com.seef.checkqr.core.designsystem.componentes.SeparadorDeLista
-import com.seef.checkqr.core.designsystem.componentes.TotalDelDia
 import com.seef.checkqr.core.designsystem.theme.Espaciado
 import com.seef.checkqr.core.designsystem.theme.Medidas
 import com.seef.checkqr.core.designsystem.theme.Montos
@@ -68,137 +66,131 @@ fun PantallaDeCuadre(
         }
     }
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = { BarraSuperior(titulo = "Cuadre de caja") },
-    ) { padding ->
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(padding)) {
+    LazyColumn(modifier = modifier.fillMaxSize()) {
+        val c = cuadre
+
+        item {
+            CabeceraDeMarca(
+                titulo = "Cuadre de caja",
+                totalCentavos = c?.totalCentavos ?: 0L,
+                cantidadDePagos = c?.cantidad ?: 0,
+                etiquetaDelTotal = "Total del día",
+                // Un dia que ya paso no "acaba de entrar": la cifra aparece
+                // puesta, sin contar.
+                animar = false,
+            )
+        }
+
+        item {
+            SelectorDeDia(
+                etiqueta = etiquetaDeDia(dia),
+                onAnterior = vm::diaAnterior,
+                onSiguiente = vm::diaSiguiente,
+            )
+        }
+
+        if (c == null) {
             item {
-                SelectorDeDia(
-                    etiqueta = etiquetaDeDia(dia),
-                    onAnterior = vm::diaAnterior,
-                    onSiguiente = vm::diaSiguiente,
+                Text(
+                    "Cargando…",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(Espaciado.estandar),
                 )
             }
-
-            val c = cuadre
-            if (c == null) {
-                item {
-                    Text(
-                        "Cargando…",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(Espaciado.estandar),
-                    )
-                }
-                return@LazyColumn
-            }
-
-            item {
-                Column(modifier = Modifier.padding(horizontal = Espaciado.estandar)) {
-                    Spacer(Modifier.height(Espaciado.corto))
-                    TotalDelDia(
-                        totalCentavos = c.totalCentavos,
-                        cantidadDePagos = c.cantidad,
-                        etiqueta = "Total del día",
-                        // Un dia que ya paso no "acaba de entrar": la cifra
-                        // aparece puesta, sin contar.
-                        animar = false,
-                    )
-                }
-            }
-
-            if (!c.cuadra) {
-                // No deberia pasar nunca; si pasa, es un fallo de agrupacion y el
-                // comerciante tiene que verlo en vez de confiar en un total mal
-                // sumado.
-                item {
-                    Column(modifier = Modifier.padding(Espaciado.estandar)) {
-                        Aviso(
-                            titulo = "El desglose no suma el total",
-                            detalle = "Avísanos del problema: el total es correcto, " +
-                                "pero el detalle por billetera no cuadra.",
-                            nivel = NivelDeAviso.PROBLEMA,
-                        )
-                    }
-                }
-            }
-
-            if (c.cantidad == 0) {
-                item {
-                    EstadoVacio(
-                        icono = Iconos.cuadre,
-                        titulo = "Sin pagos este día",
-                        detalle = "Usa las flechas de arriba para ver otro día.",
-                    )
-                }
-                return@LazyColumn
-            }
-
-            bloque("Por billetera", c.porBilletera)
-            bloque("Por cajero", c.porCajero)
-            bloque("Por turno", c.porTurno)
-            if (c.sinTurno.cantidad > 0) {
-                // El titulo dice donde encaja y la fila dice que son: repetir el
-                // mismo texto en los dos sitios se lee como un error.
-                bloque("Fuera de turno", listOf(c.sinTurno))
-            }
-
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            horizontal = Espaciado.estandar,
-                            vertical = Espaciado.amplio,
-                        ),
-                    horizontalArrangement = Arrangement.spacedBy(Espaciado.medio),
-                ) {
-                    FilledTonalButton(
-                        onClick = { compartir(FormatoDeExportacion.PDF) },
-                        shape = MaterialTheme.shapes.medium,
-                        modifier = Modifier.weight(1f).height(Medidas.objetivoTactil),
-                    ) {
-                        Icon(
-                            Icons.Outlined.Description,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                        )
-                        Spacer(Modifier.width(Espaciado.corto))
-                        Text("PDF")
-                    }
-                    FilledTonalButton(
-                        onClick = { compartir(FormatoDeExportacion.CSV) },
-                        shape = MaterialTheme.shapes.medium,
-                        modifier = Modifier.weight(1f).height(Medidas.objetivoTactil),
-                    ) {
-                        Icon(
-                            Icons.Outlined.TableChart,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                        )
-                        Spacer(Modifier.width(Espaciado.corto))
-                        Text("Excel")
-                    }
-                }
-            }
-
-            item { EncabezadoDeSeccion(texto = "Detalle", acompanante = "${c.cantidad}") }
-
-            itemsIndexed(c.pagos) { indice, p ->
-                Column {
-                    FilaDePago(
-                        montoCentavos = p.amountCents,
-                        pagador = p.payerName,
-                        billetera = p.wallet,
-                        hora = horaDe(p),
-                        reclamado = p.estaReclamado,
-                    )
-                    if (indice < c.pagos.lastIndex) SeparadorDeLista()
-                }
-            }
-
-            item { Spacer(Modifier.height(Espaciado.seccion)) }
+            return@LazyColumn
         }
+
+        if (!c.cuadra) {
+            // No deberia pasar nunca; si pasa, es un fallo de agrupacion y el
+            // comerciante tiene que verlo en vez de confiar en un total mal
+            // sumado.
+            item {
+                Column(modifier = Modifier.padding(Espaciado.estandar)) {
+                    Aviso(
+                        titulo = "El desglose no suma el total",
+                        detalle = "Avísanos del problema: el total es correcto, " +
+                            "pero el detalle por billetera no cuadra.",
+                        nivel = NivelDeAviso.PROBLEMA,
+                    )
+                }
+            }
+        }
+
+        if (c.cantidad == 0) {
+            item {
+                EstadoVacio(
+                    icono = Iconos.cuadre,
+                    titulo = "Sin pagos este día",
+                    detalle = "Usa las flechas de arriba para ver otro día.",
+                )
+            }
+            return@LazyColumn
+        }
+
+        bloque("Por billetera", c.porBilletera)
+        bloque("Por cajero", c.porCajero)
+        bloque("Por turno", c.porTurno)
+        if (c.sinTurno.cantidad > 0) {
+            // El titulo dice donde encaja y la fila dice que son: repetir el
+            // mismo texto en los dos sitios se lee como un error.
+            bloque("Fuera de turno", listOf(c.sinTurno))
+        }
+
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = Espaciado.estandar,
+                        vertical = Espaciado.amplio,
+                    ),
+                horizontalArrangement = Arrangement.spacedBy(Espaciado.medio),
+            ) {
+                OutlinedButton(
+                    onClick = { compartir(FormatoDeExportacion.PDF) },
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier.weight(1f).height(Medidas.objetivoTactil),
+                ) {
+                    Icon(
+                        Icons.Outlined.Description,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                    )
+                    Spacer(Modifier.width(Espaciado.corto))
+                    Text("PDF")
+                }
+                OutlinedButton(
+                    onClick = { compartir(FormatoDeExportacion.CSV) },
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier.weight(1f).height(Medidas.objetivoTactil),
+                ) {
+                    Icon(
+                        Icons.Outlined.TableChart,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                    )
+                    Spacer(Modifier.width(Espaciado.corto))
+                    Text("Excel")
+                }
+            }
+        }
+
+        item { EncabezadoDeSeccion(texto = "Detalle", acompanante = "${c.cantidad}") }
+
+        itemsIndexed(c.pagos) { indice, p ->
+            Column {
+                FilaDePago(
+                    montoCentavos = p.amountCents,
+                    pagador = p.payerName,
+                    billetera = p.wallet,
+                    hora = horaDe(p),
+                    reclamado = p.estaReclamado,
+                )
+                if (indice < c.pagos.lastIndex) SeparadorDeLista()
+            }
+        }
+
+        item { Spacer(Modifier.height(Espaciado.seccion)) }
     }
 }
 
@@ -248,8 +240,11 @@ private fun LazyListScope.bloque(titulo: String, renglones: List<RenglonDeCuadre
                 modifier = Modifier.padding(bottom = Espaciado.corto),
             )
             Surface(
-                shape = MaterialTheme.shapes.medium,
-                color = MaterialTheme.colorScheme.surfaceContainer,
+                shape = MaterialTheme.shapes.large,
+                // Blanco sobre el fondo gris: con surfaceContainer quedaba gris
+                // sobre gris y el bloque no se leia como una tarjeta.
+                color = MaterialTheme.colorScheme.surfaceContainerLowest,
+                shadowElevation = 1.dp,
             ) {
                 Column(modifier = Modifier.padding(Espaciado.estandar)) {
                     renglones.forEachIndexed { i, r ->
