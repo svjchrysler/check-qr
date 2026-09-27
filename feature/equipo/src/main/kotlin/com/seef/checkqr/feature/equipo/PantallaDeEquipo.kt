@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.seef.checkqr.core.designsystem.componentes.Aviso
+import com.seef.checkqr.core.designsystem.componentes.CabeceraSimple
 import com.seef.checkqr.core.designsystem.componentes.NivelDeAviso
 import com.seef.checkqr.core.model.Role
 import com.seef.checkqr.core.model.TeamMember
@@ -38,7 +39,10 @@ fun PantallaDeEquipo(
     val estado by vm.estado.collectAsStateWithLifecycle()
     val miRol by vm.miRol.collectAsStateWithLifecycle()
 
-    Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
+    // Sin padding en la raiz: la cabecera de la lista tiene que llegar hasta el
+    // borde y aplicar el inset de la barra de estado por dentro, como en las
+    // demas pantallas. Cada rama pone el suyo.
+    Column(modifier = modifier.fillMaxSize()) {
         when (val e = estado) {
             is EstadoDeEquipo.Lista -> Lista(
                 miembros = e.miembros,
@@ -47,12 +51,14 @@ fun PantallaDeEquipo(
                 onEscanear = vm::escanear,
             )
 
-            is EstadoDeEquipo.MostrandoQr -> MostrarQr(
-                carga = e.carga,
-                onVolver = vm::volver,
-            )
+            is EstadoDeEquipo.MostrandoQr -> Column(Modifier.padding(16.dp)) {
+                MostrarQr(
+                    carga = e.carga,
+                    onVolver = vm::volver,
+                )
+            }
 
-            is EstadoDeEquipo.Escaneando -> Column(Modifier.fillMaxSize()) {
+            is EstadoDeEquipo.Escaneando -> Column(Modifier.fillMaxSize().padding(16.dp)) {
                 Text(
                     "Apunta al QR que te muestre el dueño",
                     style = MaterialTheme.typography.titleMedium,
@@ -66,7 +72,7 @@ fun PantallaDeEquipo(
             }
 
             is EstadoDeEquipo.Aviso -> Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().padding(16.dp),
                 verticalArrangement = Arrangement.Center,
             ) {
                 Aviso(titulo = e.mensaje, nivel = NivelDeAviso.ATENCION)
@@ -86,14 +92,26 @@ private fun Lista(
     onInvitar: (Role) -> Unit,
     onEscanear: () -> Unit,
 ) {
-    Text("Tu equipo", style = MaterialTheme.typography.headlineSmall)
-    Text(
-        "Tú eres ${miRol.nombreVisible}",
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    // El mismo bloque de marca que el resto de las pantallas. Ademas de la
+    // coherencia visual resuelve el inset: la cabecera aplica el de la barra de
+    // estado por dentro, y antes el titulo se dibujaba encima del reloj.
+    CabeceraSimple(
+        titulo = "Tu equipo",
+        subtitulo = "Tú eres ${miRol.nombreVisible}",
     )
-    Spacer(Modifier.height(16.dp))
 
+    Column(modifier = Modifier.padding(16.dp)) {
+        ContenidoDeLaLista(miembros, miRol, onInvitar, onEscanear)
+    }
+}
+
+@Composable
+private fun ContenidoDeLaLista(
+    miembros: List<TeamMember>,
+    miRol: Role,
+    onInvitar: (Role) -> Unit,
+    onEscanear: () -> Unit,
+) {
     if (miembros.isEmpty()) {
         Text(
             "Todavía no hay nadie más en el equipo.",
