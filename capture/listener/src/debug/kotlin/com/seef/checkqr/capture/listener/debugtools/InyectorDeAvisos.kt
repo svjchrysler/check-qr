@@ -27,12 +27,19 @@ import kotlinx.coroutines.launch
  *
  * Uso:
  * ```
- * adb shell am broadcast -a com.seef.checkqr.debug.INYECTAR_AVISO \
+ * adb shell "am broadcast -a com.seef.checkqr.INYECTAR_AVISO \
  *   -n com.seef.checkqr.debug/com.seef.checkqr.capture.listener.debugtools.InyectorDeAvisos \
  *   --es paquete com.bcp.innovacxion.yapeapp \
- *   --es texto "Recibiste Bs 50,00 de Juan Perez" \
- *   --es titulo "Yape"
+ *   --es titulo Yape \
+ *   --es texto 'Recibiste Bs 50,00 de Juan Perez'"
  * ```
+ *
+ * Dos detalles que cuestan un rato si no se saben:
+ * - La accion es `com.seef.checkqr.INYECTAR_AVISO`, **sin** el `.debug` que
+ *   lleva el applicationId. El componente si lo lleva.
+ * - Todo el comando va entre comillas dobles y los valores con espacios entre
+ *   simples. Si no, el shell del dispositivo parte el texto y `am` se queda con
+ *   la primera palabra.
  *
  * Y para ver que decidio el parser:
  * ```
@@ -48,7 +55,13 @@ class InyectorDeAvisos : BroadcastReceiver() {
     private val ambito = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action != ACCION) return
+        if (intent.action != ACCION) {
+            // Devolver en silencio deja al que prueba mirando un `result=0` sin
+            // pagos y sin ninguna pista. El error tipico es escribir la accion
+            // con el `.debug` del applicationId.
+            Log.w(TAG, "Accion '${intent.action}' ignorada; se esperaba '$ACCION'")
+            return
+        }
 
         val paquete = intent.getStringExtra("paquete")
         if (paquete.isNullOrBlank()) {
@@ -67,6 +80,11 @@ class InyectorDeAvisos : BroadcastReceiver() {
             // postedAt dentro de la ventana deben producir un solo pago.
             postedAtMillis = intent.getLongExtra("postedAt", ahora),
             capturedAtMillis = ahora,
+            // `--es clave` simula la identidad que el sistema le da al aviso, y
+            // es lo que permite probar aqui los dos caminos: con la misma clave
+            // se deduplica, con claves distintas son dos cobros. Sin el extra
+            // queda nulo, como cualquier aviso que no venga del sistema.
+            claveDelSistema = intent.getStringExtra("clave"),
         )
 
         val pendiente = goAsync()
