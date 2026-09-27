@@ -60,6 +60,11 @@ class ServicioDeAvisosBancarios : NotificationListenerService() {
      * aqui. Si todavia no esta lista, no se descarta el aviso: se manda a la
      * corrutina, que ya puede suspender y consultar bien. Perder un pago por una
      * carrera de arranque seria peor que gastar una corrutina.
+     *
+     * En esa ventana el orden importa: la corrutina resuelve el paquete **antes**
+     * de leer el contenido del aviso, no despues. Asi un aviso ajeno que llega
+     * mientras la lista carga nunca llega a copiarse ni a parsearse, que es lo
+     * que promete el punto 1 de arriba.
      */
     @Volatile
     private var listaBlanca: Set<String>? = null
@@ -81,23 +86,30 @@ class ServicioDeAvisosBancarios : NotificationListenerService() {
         val aviso = sbn ?: return
         val paquete = aviso.packageName ?: return
 
-        // No se mira nada mas de un aviso ajeno. En debug hay una excepcion
-        // explicita, mas abajo, que es la herramienta de captura de datos.
-        val permitido = listaBlanca?.contains(paquete)
-        if (permitido == false && !registrador.activo) return
-
         // Nunca el propio paquete: la notificacion de "Caja abierta" es nuestra.
         if (paquete == applicationContext.packageName) return
 
-        val notice = aRawNotice(aviso, paquete)
+        // No se mira nada mas de un aviso ajeno. En debug hay una excepcion
+        // explicita, la herramienta de captura de datos, que es justo la que
+        // necesita ver los avisos de los bancos todavia desconocidos.
+        val permitido = listaBlanca?.contains(paquete)
+        if (permitido == false && !registrador.activo) return
 
         ambito.launch {
+            // Con la lista ya cargada esto no suspende. Cuando `permitido` es
+            // nulo el aviso llego durante el arranque: se resuelve el paquete
+            // aqui, y solo despues se lee el contenido.
+            val enLista = permitido ?: enListaBlancaAhora(paquete)
+            if (!enLista && !registrador.activo) return@launch
+
+            val notice = aRawNotice(aviso, paquete)
+
             if (registrador.activo) {
-                registrador.registrar(notice, enListaBlanca = permitido ?: enListaBlancaAhora(paquete))
+                registrador.registrar(notice, enListaBlanca = enLista)
             }
-            // Si la lista todavia no estaba cargada, aqui ya se puede consultar
-            // bien: el propio parser vuelve a filtrar por paquete.
-            ingestor.ingerir(notice)
+            if (enLista) {
+                ingestor.ingerir(notice)
+            }
         }
     }
 
@@ -119,6 +131,10 @@ class ServicioDeAvisosBancarios : NotificationListenerService() {
             // No es lo mismo que postTime: si el celular estaba dormido, la app
             // puede ver el aviso bastante despues. El cuadre usa postTime.
             capturedAtMillis = reloj.ahoraMillis(),
+            // La identidad que el sistema le da al aviso. Es lo que despues
+            // permite distinguir una notificacion actualizada de un cobro
+            // nuevo, en vez de adivinarlo por el reloj.
+            claveDelSistema = aviso.key,
         )
     }
 
