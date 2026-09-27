@@ -31,7 +31,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
@@ -40,8 +44,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowWidthSizeClass
-import com.seef.checkqr.core.common.Calendario
+import kotlinx.coroutines.delay
 import com.seef.checkqr.core.common.Dinero
+import com.seef.checkqr.core.common.TiempoRelativo
 import com.seef.checkqr.core.common.Plural
 import com.seef.checkqr.core.designsystem.componentes.AvatarDeBilletera
 import com.seef.checkqr.core.designsystem.componentes.MONTO_OCULTO
@@ -93,6 +98,7 @@ internal fun Mostrador(
     }
 
     val ultimo = ui.pagosDeHoy.firstOrNull()
+    val ahora = ahoraQueAvanza()
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -127,6 +133,7 @@ internal fun Mostrador(
                             pago = pago,
                             discreto = ui.modoDiscreto,
                             estiloMonto = estiloMonto,
+                            ahoraMillis = ahora,
                         )
                     }
                 }
@@ -180,11 +187,32 @@ private fun ResumenSuperior(ui: UiCaja, onSalir: () -> Unit) {
     }
 }
 
+/**
+ * Un "ahora" que avanza mientras la pantalla esta abierta.
+ *
+ * Sin esto el tiempo relativo se congela en el valor que tenia al componerse, y
+ * un "recién" que sigue diciendo "recién" media hora despues miente mas que la
+ * hora absoluta que vino a reemplazar. Se refresca cada medio minuto, que es la
+ * resolucion mas fina que el texto llega a mostrar.
+ */
+@Composable
+private fun ahoraQueAvanza(): Long {
+    var ahora by remember { mutableLongStateOf(System.currentTimeMillis()) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(30_000)
+            ahora = System.currentTimeMillis()
+        }
+    }
+    return ahora
+}
+
 @Composable
 private fun UltimoPago(
     pago: Payment,
     discreto: Boolean,
     estiloMonto: androidx.compose.ui.text.TextStyle,
+    ahoraMillis: Long,
 ) {
     Column(
         modifier = Modifier.padding(horizontal = Espaciado.amplio),
@@ -224,9 +252,12 @@ private fun UltimoPago(
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.onSurfaceVariant),
             )
-            val hora = Calendario.horaDe(pago.notifPostedAtMillis)
+            // Cuanto hace, y no la hora del reloj. El mostrador se queda con el
+            // ultimo cobro en pantalla indefinidamente: con "17:19" no hay forma
+            // de saber si acaba de entrar o es de hace dos horas, que es
+            // exactamente lo que se mira al pasar por delante.
             Text(
-                text = "%02d:%02d".format(hora.hour, hora.minute),
+                text = TiempoRelativo.desde(pago.notifPostedAtMillis, ahoraMillis),
                 style = TipografiaMostrador.etiqueta,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
