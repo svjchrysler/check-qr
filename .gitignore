@@ -17,8 +17,12 @@ local.properties
 # Gradle / build
 /build
 **/build/
+# ...pero no un paquete de codigo que se llame "build". El de los convention
+# plugins es com.seef.checkqr.build, y el patron de arriba lo tragaba entero:
+# sus tres archivos nunca llegaron a git y el repositorio no compilaba desde un
+# clon limpio. Solo funcionaba en la maquina donde se escribieron.
+!**/src/**/build/
 .kotlin/
-/build-logic/**/build/
 
 # Go
 /server/server

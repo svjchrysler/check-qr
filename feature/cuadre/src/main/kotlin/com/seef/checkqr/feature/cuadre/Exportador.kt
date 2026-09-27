@@ -62,8 +62,10 @@ class Exportador @Inject constructor(
 
     internal fun comoCsv(cuadre: CuadreDelDia): String = buildString {
         // BOM para que Excel en Windows reconozca UTF-8 y no rompa los acentos
-        // ni el simbolo de los montos.
-        append('﻿')
+        // ni el simbolo de los montos. Va como escape y no como caracter
+        // literal: el byte suelto en el fuente lo marca el lint (ByteOrderMark)
+        // y es invisible para quien edite el archivo.
+        append('\uFEFF')
 
         appendLine("Cuadre de caja;${cuadre.dia}")
         appendLine("Total;${Dinero.formatear(cuadre.totalCentavos, conSimbolo = false)}")

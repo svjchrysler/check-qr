@@ -1,0 +1,116 @@
+name: PR
+
+# Solo en pull requests hacia main. Si mas adelante quieres que corra tambien
+# al empujar a main directamente, añade:
+#   push:
+#     branches: [main]
+on:
+  pull_request:
+    branches: [main]
+
+# Un PR que recibe varios empujones seguidos cancela sus corridas anteriores.
+# Sin esto, tres commits en cinco minutos dejan tres corridas compitiendo y la
+# unica que importa —la del ultimo commit— es la que termina mas tarde.
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    name: Tests y lint de Android
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # El wrapper es un binario versionado que CI ejecuta con los permisos del
+      # repositorio. Esto comprueba que su checksum es el de una distribucion
+      # oficial de Gradle antes de correrlo.
+      - uses: gradle/actions/wrapper-validation@v6
+
+      - name: Preparar JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Preparar Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          # Solo el PR lee de la cache; escribirla desde cada rama la llena de
+          # entradas que nadie reutiliza. La rama por defecto es la que la
+          # alimenta.
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      # compileSdk es 37 y es reciente: el runner no siempre lo trae. Instalarlo
+      # explicitamente evita depender de que la imagen de GitHub lo incluya, y
+      # si ya esta el paso no hace nada.
+      #
+      # El id lleva la version menor. Android 17 publica las plataformas como
+      # android-37.0, .1 y .2, y no existe ningun `platforms;android-37` a
+      # secas: pedirlo asi falla con "Failed to find package". AGP resuelve
+      # `compileSdk = 37` contra la .0, que es la que se instala aqui.
+      - name: Instalar la plataforma Android 37
+        run: |
+          sdkmanager="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$sdkmanager" --licenses > /dev/null 2>&1 || true
+          "$sdkmanager" "platforms;android-37.0"
+
+      # `test` y no `testDebugUnitTest`: los tres modulos de Kotlin puro
+      # —core:model, core:common y capture:parser— no tienen variantes, y con la
+      # tarea de variante Gradle los saltaria en silencio. Ahi esta justo la
+      # logica mas importante.
+      - name: Tests unitarios
+        run: ./gradlew test --no-daemon --stacktrace
+
+      - name: Lint de Android
+        run: ./gradlew lintDebug --no-daemon
+
+      # Sin esto, un fallo en CI obliga a reproducirlo en local para ver que
+      # test fue. `always()` para que suba tambien cuando algo fallo, que es
+      # cuando de verdad hace falta.
+      - name: Guardar los informes
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: informes-android
+          path: |
+            **/build/reports/tests/
+            **/build/reports/lint-results-*.html
+          retention-days: 7
+          if-no-files-found: ignore
+
+  backend:
+    name: Tests del backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # El backend es Go y no comparte nada con el build de Gradle, asi que corre
+    # en paralelo. Un PR que solo toca Kotlin lo atraviesa en segundos.
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.27'
+          cache-dependency-path: server/go.sum
+
+      # `make test` y no `make test-integracion`: el segundo necesita un
+      # Postgres con las migraciones aplicadas. Levantarlo aqui es posible con
+      # un service container, pero es otra decision y no la doy por tomada.
+      - name: Tests unitarios
+        working-directory: server
+        run: make test
+
+      - name: Comprobar el formato
+        working-directory: server
+        run: |
+          sin_formato="$(gofmt -l .)"
+          if [ -n "$sin_formato" ]; then
+            echo "Estos archivos no pasaron por gofmt:"
+            echo "$sin_formato"
+            exit 1
+          fi

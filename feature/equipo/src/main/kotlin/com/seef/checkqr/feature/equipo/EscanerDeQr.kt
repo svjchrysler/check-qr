@@ -24,7 +24,10 @@ import java.util.concurrent.Executors
  * listo. Se filtra a QR (`FORMAT_QR_CODE`) para no reaccionar a los codigos de
  * barras de los productos que haya en el mostrador.
  */
-@OptIn(ExperimentalGetImage::class)
+// El OptIn de androidx y no el de Kotlin: el check `UnsafeOptInUsageError`
+// viene de androidx.annotation.experimental y solo reconoce el suyo, asi que
+// con el de Kotlin el lint fallaba aunque el codigo compilara igual.
+@androidx.annotation.OptIn(markerClass = [ExperimentalGetImage::class])
 @Composable
 fun EscanerDeQr(
     onTexto: (String) -> Unit,
