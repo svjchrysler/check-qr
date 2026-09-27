@@ -74,21 +74,28 @@ fun PantallaDeEstado(
         Column(modifier = Modifier.padding(horizontal = Espaciado.estandar)) {
             Spacer(Modifier.height(Espaciado.corto))
 
-            if (!sistema.requiereAtencion) {
+            // Si esta escuchando o no va siempre arriba y sin condicionar a lo
+            // demas. Es la pregunta que trae al comerciante a esta pantalla
+            // ("Si CheckQr deja de escuchar, aqui se ve"), y antes se la comia
+            // cualquier otra advertencia: con las plantillas sin verificar
+            // —hoy, siempre— la pantalla mostraba un aviso ambar y ni una
+            // palabra sobre si la captura estaba funcionando.
+            if (sistema.listenerConectado) {
                 AvisoDeExito(
-                    titulo = "Todo en orden",
-                    detalle = "CheckQr está escuchando los avisos de tus bancos.",
+                    titulo = "CheckQr está escuchando",
+                    detalle = "Los avisos de tus bancos llegan a la app.",
                 )
             } else {
-                if (!sistema.listenerConectado) {
-                    Aviso(
-                        titulo = "El celular dejó de escuchar los pagos",
-                        detalle = "Hay que volver a darle permiso a CheckQr para ver " +
-                            "los avisos de las apps del banco.",
-                        nivel = NivelDeAviso.PROBLEMA,
-                    )
-                    Spacer(Modifier.height(Espaciado.corto))
-                }
+                Aviso(
+                    titulo = "El celular dejó de escuchar los pagos",
+                    detalle = "Hay que volver a darle permiso a CheckQr para ver " +
+                        "los avisos de las apps del banco.",
+                    nivel = NivelDeAviso.PROBLEMA,
+                )
+            }
+            Spacer(Modifier.height(Espaciado.corto))
+
+            if (sistema.requiereAtencion) {
                 if (sistema.plantillasSinVerificar) {
                     Aviso(
                         titulo = "Plantillas de banco sin verificar",

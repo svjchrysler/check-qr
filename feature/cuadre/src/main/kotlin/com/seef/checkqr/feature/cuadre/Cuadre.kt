@@ -34,6 +34,17 @@ data class CuadreDelDia(
 ) {
     val cuadra: Boolean
         get() = porBilletera.sumOf(RenglonDeCuadre::totalCentavos) == totalCentavos
+
+    /**
+     * Si tiene sentido mostrar el bloque "fuera de turno".
+     *
+     * "Fuera de turno" solo dice algo por contraste con los turnos que si
+     * hubo. Un dia en que nadie abrio la caja tiene todos sus pagos fuera de
+     * turno, y entonces el bloque repite la cifra de la cabecera y se lee como
+     * si sumara aparte.
+     */
+    val muestraSinTurno: Boolean
+        get() = sinTurno.cantidad > 0 && porTurno.isNotEmpty()
 }
 
 /**
@@ -68,15 +79,22 @@ object ArmadorDeCuadre {
         // La pseudo-billetera DESCONOCIDA no esta en `soportadas`, pero si hay
         // pagos con ella tienen que aparecer o el cuadre no sumaria.
         val desconocidos = pagos.filter { it.wallet == Wallet.DESCONOCIDA }
-        val billeterasCompletas = if (desconocidos.isEmpty()) {
-            porBilletera
-        } else {
-            porBilletera + RenglonDeCuadre(
-                etiqueta = Wallet.DESCONOCIDA.nombreVisible,
-                cantidad = desconocidos.size,
-                totalCentavos = desconocidos.sumOf(Payment::amountCents),
+        val billeterasCompletas = (
+            if (desconocidos.isEmpty()) {
+                porBilletera
+            } else {
+                porBilletera + RenglonDeCuadre(
+                    etiqueta = Wallet.DESCONOCIDA.nombreVisible,
+                    cantidad = desconocidos.size,
+                    totalCentavos = desconocidos.sumOf(Payment::amountCents),
+                )
+            }
             )
-        }
+            // Por monto y no por el orden en que estan declaradas: al cerrar
+            // caja lo primero que se mira es por donde entro mas plata. Es
+            // ademas el mismo orden que ya usan cajeros y turnos. Se ordena
+            // despues de sumar DESCONOCIDA para que participe como una mas.
+            .sortedByDescending(RenglonDeCuadre::totalCentavos)
 
         val porCajero = pagos
             .filter { it.cashierId != null }

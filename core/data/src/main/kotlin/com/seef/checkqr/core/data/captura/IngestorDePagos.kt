@@ -47,7 +47,7 @@ class IngestorDePagos @Inject constructor(
         val parser = plantillas.parser()
 
         return when (val r = parser.parse(notice)) {
-            is ParseResult.Cobro -> guardarCobro(r)
+            is ParseResult.Cobro -> guardarCobro(r, notice.claveDelSistema)
 
             is ParseResult.ContenidoOculto -> {
                 // Se registra la senal para que "Estado del sistema" pueda decir
@@ -67,12 +67,16 @@ class IngestorDePagos @Inject constructor(
         }
     }
 
-    private suspend fun guardarCobro(cobro: ParseResult.Cobro): ResultadoDeIngesta {
+    private suspend fun guardarCobro(
+        cobro: ParseResult.Cobro,
+        claveDelSistema: String?,
+    ): ResultadoDeIngesta {
         val dedupKey = Payment.dedupKeyDe(
             sourcePackage = cobro.sourcePackage,
             amountCents = cobro.amountCents,
             reference = cobro.reference,
             postedAtMillis = cobro.notifPostedAtMillis,
+            claveDelSistema = claveDelSistema,
         )
 
         // El turno se resuelve al momento de la ingesta: un pago que llega con la

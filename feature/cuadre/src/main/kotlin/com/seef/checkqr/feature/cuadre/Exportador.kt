@@ -73,7 +73,7 @@ class Exportador @Inject constructor(
         seccion("Por billetera", cuadre.porBilletera)
         seccion("Por cajero", cuadre.porCajero)
         seccion("Por turno", cuadre.porTurno)
-        if (cuadre.sinTurno.cantidad > 0) {
+        if (cuadre.muestraSinTurno) {
             seccion("Fuera de turno", listOf(cuadre.sinTurno))
         }
 
@@ -181,7 +181,7 @@ class Exportador @Inject constructor(
         bloque("Por billetera", cuadre.porBilletera)
         bloque("Por cajero", cuadre.porCajero)
         bloque("Por turno", cuadre.porTurno)
-        if (cuadre.sinTurno.cantidad > 0) {
+        if (cuadre.muestraSinTurno) {
             bloque("Fuera de turno", listOf(cuadre.sinTurno))
         }
 

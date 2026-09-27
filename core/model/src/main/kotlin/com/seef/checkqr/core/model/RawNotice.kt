@@ -19,6 +19,18 @@ data class RawNotice(
     val postedAtMillis: Long,
     /** Cuando lo vio la app. Puede ser bastante posterior si el celular dormia. */
     val capturedAtMillis: Long,
+    /**
+     * `StatusBarNotification.key`, la identidad que el sistema le da al aviso.
+     *
+     * Sirve para distinguir un aviso reemitido de un cobro nuevo: Android
+     * mantiene la misma clave cuando una app actualiza su notificacion, y emite
+     * una distinta cuando publica otra. Es el unico dato fiable para eso, y por
+     * eso viaja hasta la clave de deduplicacion; ver [Payment.dedupKeyDe].
+     *
+     * Nulo cuando el aviso no viene del sistema (el inyector de depuracion y
+     * los tests), y entonces la deduplicacion cae al bloque de tiempo.
+     */
+    val claveDelSistema: String? = null,
 ) {
     /**
      * Todo el texto del aviso, en el orden en que conviene buscar: el detalle

@@ -53,7 +53,7 @@ class PagoDaoTest {
         ventana: Long = Payment.VENTANA_DEDUP_MILLIS,
     ) = PagoEntity(
         id = id,
-        dedupKey = Payment.dedupKeyDe(paquete, centavos, referencia, postedAt, ventana),
+        dedupKey = Payment.dedupKeyDe(paquete, centavos, referencia, postedAt, ventanaMillis = ventana),
         walletId = Wallet.YAPE.id,
         sourcePackage = paquete,
         amountCents = centavos,

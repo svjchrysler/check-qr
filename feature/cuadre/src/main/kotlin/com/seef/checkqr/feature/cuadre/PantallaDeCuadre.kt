@@ -19,7 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.TableChart
 import com.seef.checkqr.core.designsystem.Iconos
-import androidx.compose.material3.OutlinedButton
+import com.seef.checkqr.core.designsystem.componentes.BotonSecundario
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.HorizontalDivider
@@ -86,6 +86,7 @@ fun PantallaDeCuadre(
                 etiqueta = etiquetaDeDia(dia),
                 onAnterior = vm::diaAnterior,
                 onSiguiente = vm::diaSiguiente,
+                puedeAvanzar = dia < Calendario.diaDe(System.currentTimeMillis()),
             )
         }
 
@@ -130,7 +131,7 @@ fun PantallaDeCuadre(
         bloque("Por billetera", c.porBilletera)
         bloque("Por cajero", c.porCajero)
         bloque("Por turno", c.porTurno)
-        if (c.sinTurno.cantidad > 0) {
+        if (c.muestraSinTurno) {
             // El titulo dice donde encaja y la fila dice que son: repetir el
             // mismo texto en los dos sitios se lee como un error.
             bloque("Fuera de turno", listOf(c.sinTurno))
@@ -146,32 +147,18 @@ fun PantallaDeCuadre(
                     ),
                 horizontalArrangement = Arrangement.spacedBy(Espaciado.medio),
             ) {
-                OutlinedButton(
+                BotonSecundario(
+                    texto = "PDF",
+                    icono = Icons.Outlined.Description,
                     onClick = { compartir(FormatoDeExportacion.PDF) },
-                    shape = MaterialTheme.shapes.medium,
-                    modifier = Modifier.weight(1f).height(Medidas.objetivoTactil),
-                ) {
-                    Icon(
-                        Icons.Outlined.Description,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                    )
-                    Spacer(Modifier.width(Espaciado.corto))
-                    Text("PDF")
-                }
-                OutlinedButton(
+                    modifier = Modifier.weight(1f),
+                )
+                BotonSecundario(
+                    texto = "Excel",
+                    icono = Icons.Outlined.TableChart,
                     onClick = { compartir(FormatoDeExportacion.CSV) },
-                    shape = MaterialTheme.shapes.medium,
-                    modifier = Modifier.weight(1f).height(Medidas.objetivoTactil),
-                ) {
-                    Icon(
-                        Icons.Outlined.TableChart,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                    )
-                    Spacer(Modifier.width(Espaciado.corto))
-                    Text("Excel")
-                }
+                    modifier = Modifier.weight(1f),
+                )
             }
         }
 
@@ -199,6 +186,8 @@ private fun SelectorDeDia(
     etiqueta: String,
     onAnterior: () -> Unit,
     onSiguiente: () -> Unit,
+    /** Falso en el dia de hoy: no hay manana que mostrar. */
+    puedeAvanzar: Boolean,
 ) {
     Row(
         modifier = Modifier
@@ -214,7 +203,7 @@ private fun SelectorDeDia(
             )
         }
         Text(etiqueta, style = MaterialTheme.typography.titleMedium)
-        IconButton(onClick = onSiguiente) {
+        IconButton(onClick = onSiguiente, enabled = puedeAvanzar) {
             Icon(
                 Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = "Día siguiente",
