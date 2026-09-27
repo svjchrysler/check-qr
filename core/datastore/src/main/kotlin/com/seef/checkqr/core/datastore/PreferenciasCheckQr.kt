@@ -150,6 +150,19 @@ class PreferenciasCheckQr @Inject constructor(
         return arranqueActualMillis != anterior
     }
 
+    // --- Push ---------------------------------------------------------------------
+
+    /**
+     * Token de FCM de este celular.
+     *
+     * Se guarda porque FCM lo rota, y si no se vuelve a registrar contra el
+     * backend el celular deja de recibir los pagos de los demas en silencio.
+     */
+    val tokenDePush: Flow<String?> = store.data.map { it[Claves.TOKEN_DE_PUSH] }
+
+    suspend fun fijarTokenDePush(token: String) =
+        store.edit { it[Claves.TOKEN_DE_PUSH] = token }.let { }
+
     // --- Privacidad ------------------------------------------------------------
 
     /**
@@ -185,5 +198,6 @@ class PreferenciasCheckQr @Inject constructor(
         val ULTIMO_ARRANQUE = longPreferencesKey("ultimo_arranque")
         val COMPARTIR_NO_RECONOCIDOS = booleanPreferencesKey("compartir_no_reconocidos")
         val VERSION_PLANTILLAS = longPreferencesKey("version_plantillas")
+        val TOKEN_DE_PUSH = stringPreferencesKey("token_de_push")
     }
 }

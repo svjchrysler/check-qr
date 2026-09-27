@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <!--
+          Recibe los pagos que capturo el celular del dueno, como mensaje de
+          datos. Requiere google-services.json, que todavia no existe: sin el, el
+          servicio simplemente nunca recibe nada y la app funciona igual en local.
+        -->
+        <service
+            android:name="com.seef.checkqr.sync.push.ServicioDeMensajes"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+    </application>
+</manifest>

@@ -30,7 +30,9 @@ dependencies {
 
     implementation(platform(libs.okhttp.bom))
     implementation(libs.okhttp)
-    implementation(libs.retrofit)
+    // `api` y no `implementation`: ApiDeCheckQr devuelve retrofit2.Response,
+    // asi que Retrofit es parte del contrato publico de este modulo.
+    api(libs.retrofit)
     implementation(libs.retrofit.kotlinx.serialization)
     implementation(libs.kotlinx.serialization.json)
     debugImplementation(libs.okhttp.logging.interceptor)

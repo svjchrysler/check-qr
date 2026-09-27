@@ -61,6 +61,22 @@
             </intent-filter>
         </activity>
 
+        <!--
+          WorkManager se inicializa desde Application, porque los workers se
+          inyectan con Hilt. Sin quitar este inicializador por omision, se
+          crearia una instancia sin la factory de Hilt y los workers fallarian.
+        -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

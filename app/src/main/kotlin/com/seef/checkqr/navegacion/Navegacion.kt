@@ -3,6 +3,8 @@ package com.seef.checkqr.navegacion
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.PointOfSale
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Receipt
@@ -23,20 +25,26 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import com.seef.checkqr.feature.caja.PantallaDeCaja
+import com.seef.checkqr.feature.caja.PantallaDeEstado
+import com.seef.checkqr.feature.equipo.PantallaDeEquipo
 import com.seef.checkqr.feature.cuadre.PantallaDeCuadre
 import com.seef.checkqr.feature.verificar.PantallaDeVerificar
 
 /**
- * Las tres pantallas del uso diario.
+ * Las pantallas de la app.
  *
- * Equipo y Estado del sistema no estan en la barra inferior a proposito: son
- * cosas que se configuran una vez o se miran cuando algo va mal, y ocupar un
- * quinto del ancho con ellas le quitaria sitio a lo que se usa todo el dia.
+ * Las tres primeras son el uso diario y van primero. Equipo y Estado se usan
+ * poco (una se configura al principio, la otra se mira cuando algo va mal), pero
+ * estan en la barra igual: esconder "Estado del sistema" en un menu seria
+ * esconder justamente lo que el comerciante necesita encontrar rapido el dia que
+ * deja de escuchar sus pagos.
  */
 enum class Destino(val ruta: String, val etiqueta: String, val icono: ImageVector) {
     CAJA("caja", "Caja", Icons.Default.PointOfSale),
     VERIFICAR("verificar", "Verificar", Icons.Default.QrCodeScanner),
     CUADRE("cuadre", "Cuadre", Icons.Default.Receipt),
+    EQUIPO("equipo", "Equipo", Icons.Default.Groups),
+    ESTADO("estado", "Estado", Icons.Default.MonitorHeart),
 }
 
 @Composable
@@ -89,6 +97,8 @@ fun NavegacionDeCheckQr(modifier: Modifier = Modifier) {
             ) { PantallaDeVerificar() }
 
             composable(Destino.CUADRE.ruta) { PantallaDeCuadre() }
+            composable(Destino.EQUIPO.ruta) { PantallaDeEquipo() }
+            composable(Destino.ESTADO.ruta) { PantallaDeEstado() }
         }
     }
 }
