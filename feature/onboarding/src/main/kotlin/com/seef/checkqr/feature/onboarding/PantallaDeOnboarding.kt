@@ -11,14 +11,24 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.Surface
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,7 +39,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.seef.checkqr.core.designsystem.componentes.AvatarDeBilletera
 import com.seef.checkqr.core.designsystem.componentes.Aviso
+import com.seef.checkqr.core.designsystem.theme.Espaciado
+import com.seef.checkqr.core.designsystem.theme.Medidas
 import com.seef.checkqr.core.designsystem.componentes.NivelDeAviso
 import com.seef.checkqr.core.model.Wallet
 import com.seef.checkqr.voice.LectorDeVoz
@@ -51,8 +64,12 @@ fun PantallaDeOnboarding(
     Column(
         modifier = modifier
             .fillMaxSize()
+            // El onboarding no usa Scaffold, asi que aplica el inset el mismo:
+            // sin esto la barra de progreso queda bajo el reloj del sistema.
+            .statusBarsPadding()
+            .navigationBarsPadding()
             .verticalScroll(rememberScrollState())
-            .padding(24.dp),
+            .padding(Espaciado.amplio),
     ) {
         val total = PasoDelOnboarding.entries.size - 1
         val actual = PasoDelOnboarding.entries.indexOf(ui.paso) + 1
@@ -63,7 +80,7 @@ fun PantallaDeOnboarding(
         Text(
             "Paso $actual de $total",
             style = MaterialTheme.typography.labelMedium,
-            modifier = Modifier.padding(vertical = 8.dp),
+            modifier = Modifier.padding(vertical = Espaciado.corto),
         )
 
         when (ui.paso) {
@@ -115,13 +132,13 @@ private fun PorQue(onSiguiente: () -> Unit) {
             "CheckQr lee ese aviso y lo dice en voz alta, para que no tengas que " +
             "sacar el celular ni revisar la pantalla mientras atiendes.",
     )
-    Spacer(Modifier.height(16.dp))
+    Spacer(Modifier.height(Espaciado.estandar))
     Titulo("Por eso te va a pedir ver tus avisos", pequeno = true)
     Parrafo(
         "En el siguiente paso Android te va a preguntar si CheckQr puede ver tus " +
             "notificaciones. Es lo que hace posible todo lo demás.",
     )
-    Spacer(Modifier.height(8.dp))
+    Spacer(Modifier.height(Espaciado.corto))
     Parrafo(
         "CheckQr solo mira los avisos de las apps de los 6 bancos de la lista. " +
             "Todo lo demás — tus mensajes, tus fotos, tus otras apps — se descarta " +
@@ -165,7 +182,7 @@ private fun AccesoANotificaciones(
         "Android no permite pedir esto con un botón: hay que activarlo a mano en " +
             "los ajustes. Toca «Abrir ajustes», busca CheckQr en la lista y actívalo.",
     )
-    Spacer(Modifier.height(16.dp))
+    Spacer(Modifier.height(Espaciado.estandar))
 
     if (concedido) {
         Aviso(
@@ -177,11 +194,11 @@ private fun AccesoANotificaciones(
         Button(onClick = onAbrirAjustes, modifier = Modifier.fillMaxWidth()) {
             Text("Abrir ajustes")
         }
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Espaciado.corto))
         OutlinedButton(onClick = onComprobar, modifier = Modifier.fillMaxWidth()) {
             Text("Ya lo activé, comprobar")
         }
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(Espaciado.estandar))
         Aviso(
             titulo = "Sin esto la app no puede capturar ningún pago",
             detalle = "Es el permiso central: todo lo demás depende de él.",
@@ -202,7 +219,7 @@ private fun Bateria(
             "batería. Si le pasa a CheckQr, dejarías de recibir los avisos sin " +
             "enterarte. Estos pasos lo evitan.",
     )
-    Spacer(Modifier.height(16.dp))
+    Spacer(Modifier.height(Espaciado.estandar))
 
     guia?.pasos?.forEachIndexed { i, paso ->
         Row(modifier = Modifier.padding(vertical = 4.dp)) {
@@ -211,9 +228,9 @@ private fun Bateria(
         }
     }
 
-    Spacer(Modifier.height(16.dp))
+    Spacer(Modifier.height(Espaciado.estandar))
     Button(onClick = onAbrir, modifier = Modifier.fillMaxWidth()) { Text("Abrir ajustes") }
-    Spacer(Modifier.height(8.dp))
+    Spacer(Modifier.height(Espaciado.corto))
     OutlinedButton(onClick = onSiguiente, modifier = Modifier.fillMaxWidth()) {
         Text("Ya está, continuar")
     }
@@ -231,7 +248,7 @@ private fun Voz(
         "CheckQr habla en español y funciona sin internet, siempre que el celular " +
             "tenga la voz en español instalada.",
     )
-    Spacer(Modifier.height(16.dp))
+    Spacer(Modifier.height(Espaciado.estandar))
 
     when {
         ui.faltaInstalarVoz -> {
@@ -248,7 +265,7 @@ private fun Voz(
             Button(onClick = onProbar, modifier = Modifier.fillMaxWidth()) {
                 Text("Probar la voz")
             }
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(Espaciado.corto))
             Siguiente(onSiguiente, "Se escucha bien, continuar")
         }
         else -> Text("Preparando la voz…", style = MaterialTheme.typography.bodyMedium)
@@ -268,46 +285,77 @@ private fun Prueba(
             "tu banco en tu celular. Pídele a alguien que te mande Bs 1 desde cada " +
             "una, o hazlo tú desde otra cuenta.",
     )
-    Spacer(Modifier.height(8.dp))
+    Spacer(Modifier.height(Espaciado.corto))
     Parrafo("El tilde aparece solo en cuanto llegue el pago. No tienes que tocar nada.")
-    Spacer(Modifier.height(16.dp))
+    Spacer(Modifier.height(Espaciado.estandar))
 
-    Wallet.soportadas.forEach { billetera ->
-        val ok = billetera in probadas
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(billetera.nombreVisible, style = MaterialTheme.typography.bodyLarge)
-            Text(
-                text = if (ok) "✓ probado" else "sin probar",
-                style = MaterialTheme.typography.labelLarge,
-                color = if (ok) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
-            )
+    Surface(
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(modifier = Modifier.padding(vertical = Espaciado.corto)) {
+            Wallet.soportadas.forEachIndexed { i, billetera ->
+                val ok = billetera in probadas
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = Espaciado.estandar,
+                            vertical = Espaciado.medio,
+                        ),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        AvatarDeBilletera(billetera, tamano = 36.dp)
+                        Spacer(Modifier.width(Espaciado.medio))
+                        Text(
+                            billetera.nombreVisible,
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    }
+                    if (ok) {
+                        Icon(
+                            imageVector = Icons.Filled.CheckCircle,
+                            contentDescription = "Probado",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    } else {
+                        Text(
+                            text = "Sin probar",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+                if (i < Wallet.soportadas.lastIndex) {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(start = 68.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                    )
+                }
+            }
         }
     }
 
-    Spacer(Modifier.height(16.dp))
+    Spacer(Modifier.height(Espaciado.estandar))
 
     if (completo) {
         Aviso(
             titulo = "Las 6 billeteras funcionan en este celular",
             nivel = NivelDeAviso.INFORMATIVO,
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Espaciado.corto))
         Siguiente(onTerminar, "Empezar a usar CheckQr")
     } else {
         Siguiente(onTerminar, "Empezar a usar CheckQr")
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Espaciado.corto))
         TextButton(onClick = onSaltar, modifier = Modifier.fillMaxWidth()) {
             Text("Probar más tarde")
         }
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Espaciado.corto))
         Aviso(
             titulo = "Las billeteras sin probar pueden no funcionar",
             detalle = "Si un banco cambió el formato de sus avisos, CheckQr no lo " +
@@ -330,7 +378,7 @@ private fun Titulo(texto: String, pequeno: Boolean = false) {
             MaterialTheme.typography.headlineSmall
         },
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(bottom = 12.dp),
+        modifier = Modifier.padding(bottom = Espaciado.medio),
     )
 }
 
@@ -339,14 +387,14 @@ private fun Parrafo(texto: String) {
     Text(
         text = texto,
         style = MaterialTheme.typography.bodyLarge,
-        modifier = Modifier.padding(bottom = 4.dp),
+        modifier = Modifier.padding(bottom = Espaciado.minimo),
     )
 }
 
 @Composable
 private fun Siguiente(onClick: () -> Unit, texto: String) {
-    Spacer(Modifier.height(24.dp))
-    Button(onClick = onClick, modifier = Modifier.fillMaxWidth().height(56.dp)) {
+    Spacer(Modifier.height(Espaciado.amplio))
+    Button(onClick = onClick, modifier = Modifier.fillMaxWidth().height(Medidas.botonPrincipal)) {
         Text(texto, style = MaterialTheme.typography.titleMedium)
     }
 }

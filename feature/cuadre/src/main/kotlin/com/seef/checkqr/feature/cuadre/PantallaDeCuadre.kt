@@ -8,29 +8,46 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.Receipt
+import androidx.compose.material.icons.outlined.TableChart
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.seef.checkqr.core.common.Calendario
 import com.seef.checkqr.core.common.Dinero
 import com.seef.checkqr.core.designsystem.componentes.Aviso
+import com.seef.checkqr.core.designsystem.componentes.BarraSuperior
+import com.seef.checkqr.core.designsystem.componentes.EncabezadoDeSeccion
+import com.seef.checkqr.core.designsystem.componentes.EstadoVacio
 import com.seef.checkqr.core.designsystem.componentes.FilaDePago
 import com.seef.checkqr.core.designsystem.componentes.NivelDeAviso
-import com.seef.checkqr.core.designsystem.theme.TipografiaMostrador
+import com.seef.checkqr.core.designsystem.componentes.SeparadorDeLista
+import com.seef.checkqr.core.designsystem.componentes.TarjetaDeTotal
+import com.seef.checkqr.core.designsystem.theme.Espaciado
+import com.seef.checkqr.core.designsystem.theme.Medidas
+import com.seef.checkqr.core.designsystem.theme.Montos
 import com.seef.checkqr.core.model.Payment
 
 @Composable
@@ -50,129 +67,231 @@ fun PantallaDeCuadre(
         }
     }
 
-    LazyColumn(modifier = modifier.fillMaxSize()) {
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                TextButton(onClick = vm::diaAnterior) { Text("‹ Anterior") }
-                Text(dia.toString(), style = MaterialTheme.typography.titleMedium)
-                TextButton(onClick = vm::diaSiguiente) { Text("Siguiente ›") }
-            }
-        }
-
-        val c = cuadre
-        if (c == null) {
-            item { Text("Cargando…", modifier = Modifier.padding(16.dp)) }
-            return@LazyColumn
-        }
-
-        item {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text("Total del día", style = MaterialTheme.typography.labelLarge)
-                Text(
-                    Dinero.formatear(c.totalCentavos),
-                    style = TipografiaMostrador.total,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                Text("${c.cantidad} pagos", style = MaterialTheme.typography.bodyMedium)
-            }
-        }
-
-        if (!c.cuadra) {
-            // No deberia pasar nunca; si pasa, es un fallo de agrupacion y el
-            // comerciante tiene que verlo en vez de confiar en un total mal sumado.
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = { BarraSuperior(titulo = "Cuadre de caja") },
+    ) { padding ->
+        LazyColumn(modifier = Modifier.fillMaxSize().padding(padding)) {
             item {
-                Aviso(
-                    titulo = "El desglose no suma el total",
-                    detalle = "Avisa del problema: el total es correcto, pero el detalle " +
-                        "por billetera no cuadra.",
-                    nivel = NivelDeAviso.PROBLEMA,
+                SelectorDeDia(
+                    etiqueta = etiquetaDeDia(dia),
+                    onAnterior = vm::diaAnterior,
+                    onSiguiente = vm::diaSiguiente,
                 )
             }
-        }
 
-        bloque("Por billetera", c.porBilletera)
-        bloque("Por cajero", c.porCajero)
-        bloque("Por turno", c.porTurno)
-        if (c.sinTurno.cantidad > 0) {
-            bloque("Con la caja cerrada", listOf(c.sinTurno))
-        }
-
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Button(
-                    onClick = { compartir(FormatoDeExportacion.PDF) },
-                    modifier = Modifier.weight(1f),
-                ) { Text("Compartir PDF") }
-                OutlinedButton(
-                    onClick = { compartir(FormatoDeExportacion.CSV) },
-                    modifier = Modifier.weight(1f),
-                ) { Text("Compartir Excel") }
+            val c = cuadre
+            if (c == null) {
+                item {
+                    Text(
+                        "Cargando…",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(Espaciado.estandar),
+                    )
+                }
+                return@LazyColumn
             }
-        }
 
-        item {
-            Text(
-                "Detalle",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            item {
+                Column(modifier = Modifier.padding(horizontal = Espaciado.estandar)) {
+                    TarjetaDeTotal(
+                        totalCentavos = c.totalCentavos,
+                        cantidadDePagos = c.cantidad,
+                        cajaAbierta = false,
+                        etiqueta = "Total del día",
+                    )
+                }
+            }
+
+            if (!c.cuadra) {
+                // No deberia pasar nunca; si pasa, es un fallo de agrupacion y el
+                // comerciante tiene que verlo en vez de confiar en un total mal
+                // sumado.
+                item {
+                    Column(modifier = Modifier.padding(Espaciado.estandar)) {
+                        Aviso(
+                            titulo = "El desglose no suma el total",
+                            detalle = "Avísanos del problema: el total es correcto, " +
+                                "pero el detalle por billetera no cuadra.",
+                            nivel = NivelDeAviso.PROBLEMA,
+                        )
+                    }
+                }
+            }
+
+            if (c.cantidad == 0) {
+                item {
+                    EstadoVacio(
+                        icono = Icons.Outlined.Receipt,
+                        titulo = "Sin pagos este día",
+                        detalle = "Usa las flechas de arriba para ver otro día.",
+                    )
+                }
+                return@LazyColumn
+            }
+
+            bloque("Por billetera", c.porBilletera)
+            bloque("Por cajero", c.porCajero)
+            bloque("Por turno", c.porTurno)
+            if (c.sinTurno.cantidad > 0) {
+                // El titulo dice donde encaja y la fila dice que son: repetir el
+                // mismo texto en los dos sitios se lee como un error.
+                bloque("Fuera de turno", listOf(c.sinTurno))
+            }
+
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = Espaciado.estandar,
+                            vertical = Espaciado.amplio,
+                        ),
+                    horizontalArrangement = Arrangement.spacedBy(Espaciado.medio),
+                ) {
+                    FilledTonalButton(
+                        onClick = { compartir(FormatoDeExportacion.PDF) },
+                        shape = MaterialTheme.shapes.medium,
+                        modifier = Modifier.weight(1f).height(Medidas.objetivoTactil),
+                    ) {
+                        Icon(
+                            Icons.Outlined.Description,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(Modifier.width(Espaciado.corto))
+                        Text("PDF")
+                    }
+                    FilledTonalButton(
+                        onClick = { compartir(FormatoDeExportacion.CSV) },
+                        shape = MaterialTheme.shapes.medium,
+                        modifier = Modifier.weight(1f).height(Medidas.objetivoTactil),
+                    ) {
+                        Icon(
+                            Icons.Outlined.TableChart,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(Modifier.width(Espaciado.corto))
+                        Text("Excel")
+                    }
+                }
+            }
+
+            item { EncabezadoDeSeccion(texto = "Detalle", acompanante = "${c.cantidad}") }
+
+            itemsIndexed(c.pagos) { indice, p ->
+                Column {
+                    FilaDePago(
+                        montoCentavos = p.amountCents,
+                        pagador = p.payerName,
+                        billetera = p.wallet,
+                        hora = horaDe(p),
+                        reclamado = p.estaReclamado,
+                    )
+                    if (indice < c.pagos.lastIndex) SeparadorDeLista()
+                }
+            }
+
+            item { Spacer(Modifier.height(Espaciado.seccion)) }
+        }
+    }
+}
+
+@Composable
+private fun SelectorDeDia(
+    etiqueta: String,
+    onAnterior: () -> Unit,
+    onSiguiente: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = Espaciado.corto, vertical = Espaciado.corto),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        IconButton(onClick = onAnterior) {
+            Icon(
+                Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                contentDescription = "Día anterior",
             )
         }
-
-        items(c.pagos, key = Payment::id) { p ->
-            val hora = Calendario.horaDe(p.notifPostedAtMillis)
-            FilaDePago(
-                montoCentavos = p.amountCents,
-                pagador = p.payerName,
-                billetera = p.wallet.nombreVisible,
-                hora = "%02d:%02d".format(hora.hour, hora.minute),
-                reclamado = p.estaReclamado,
+        Text(etiqueta, style = MaterialTheme.typography.titleMedium)
+        IconButton(onClick = onSiguiente) {
+            Icon(
+                Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = "Día siguiente",
             )
         }
     }
 }
 
-private fun androidx.compose.foundation.lazy.LazyListScope.bloque(
-    titulo: String,
-    renglones: List<RenglonDeCuadre>,
-) {
+/**
+ * Un bloque del desglose.
+ *
+ * Va sobre una superficie propia y con esquinas: separa visualmente "cómo se
+ * reparte" de "la lista de pagos", que son dos lecturas distintas del mismo día.
+ */
+private fun LazyListScope.bloque(titulo: String, renglones: List<RenglonDeCuadre>) {
     if (renglones.isEmpty()) return
     item {
-        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+        Column(modifier = Modifier.padding(horizontal = Espaciado.estandar)) {
+            Spacer(Modifier.height(Espaciado.estandar))
             Text(
-                titulo,
+                text = titulo,
                 style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(vertical = 6.dp),
+                modifier = Modifier.padding(bottom = Espaciado.corto),
             )
-            renglones.forEach { r ->
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Text(
-                        "${r.etiqueta} (${r.cantidad})",
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    Text(
-                        Dinero.formatear(r.totalCentavos),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium,
-                    )
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.surfaceContainer,
+            ) {
+                Column(modifier = Modifier.padding(Espaciado.estandar)) {
+                    renglones.forEachIndexed { i, r ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = Espaciado.corto),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Column {
+                                Text(r.etiqueta, style = MaterialTheme.typography.bodyLarge)
+                                Text(
+                                    text = if (r.cantidad == 1) "1 pago" else "${r.cantidad} pagos",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                            Text(
+                                text = Dinero.formatear(r.totalCentavos),
+                                style = Montos.renglon,
+                            )
+                        }
+                        if (i < renglones.lastIndex) {
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                            )
+                        }
+                    }
                 }
             }
-            Spacer(Modifier.height(4.dp))
-            HorizontalDivider()
         }
+    }
+}
+
+private fun horaDe(pago: Payment): String {
+    val hora = Calendario.horaDe(pago.notifPostedAtMillis)
+    return "%02d:%02d".format(hora.hour, hora.minute)
+}
+
+private fun etiquetaDeDia(dia: kotlinx.datetime.LocalDate): String {
+    val meses = listOf(
+        "enero", "febrero", "marzo", "abril", "mayo", "junio",
+        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+    )
+    val hoy = Calendario.diaDe(System.currentTimeMillis())
+    return when (dia) {
+        hoy -> "Hoy"
+        else -> "${dia.day} de ${meses[dia.month.ordinal]}"
     }
 }

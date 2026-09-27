@@ -3,6 +3,16 @@ package com.seef.checkqr.core.designsystem.theme
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
+
+/**
+ * Si el tema vigente es oscuro.
+ *
+ * Hace falta porque la identidad de cada billetera tiene variante clara y
+ * oscura, y esos colores no viven en el ColorScheme de Material.
+ */
+val LocalTemaOscuro = staticCompositionLocalOf { false }
 
 /**
  * Tema de CheckQr.
@@ -17,9 +27,12 @@ fun CheckQrTheme(
     oscuro: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
-    MaterialTheme(
-        colorScheme = if (oscuro) esquemaOscuro else esquemaClaro,
-        typography = tipografia,
-        content = content,
-    )
+    CompositionLocalProvider(LocalTemaOscuro provides oscuro) {
+        MaterialTheme(
+            colorScheme = if (oscuro) esquemaOscuro else esquemaClaro,
+            typography = tipografia,
+            shapes = formas,
+            content = content,
+        )
+    }
 }

@@ -29,7 +29,6 @@ data class UiCaja(
     val pagosDeHoy: List<Payment> = emptyList(),
     val totalDeHoyCentavos: Long = 0L,
     val estadoDelSistema: EstadoDelSistema? = null,
-    val modoMostrador: Boolean = false,
     val modoDiscreto: Boolean = false,
     /**
      * Ultimo aviso que llego sin contenido legible.
@@ -50,7 +49,6 @@ class CajaViewModel @Inject constructor(
     private val bus: BusDeCaptura,
 ) : ViewModel() {
 
-    private val modoMostrador = MutableStateFlow(false)
     private val contenidoOculto = MutableStateFlow<String?>(null)
 
     val ui: StateFlow<UiCaja> = combine(
@@ -58,15 +56,14 @@ class CajaViewModel @Inject constructor(
         pagos.pagosDeHoy(),
         pagos.totalDeHoy(),
         estado.estado(),
-        combine(modoMostrador, prefs.modoDiscreto, contenidoOculto) { m, d, o -> Triple(m, d, o) },
-    ) { caja, listaDePagos, total, sistema, (mostrador, discreto, oculto) ->
+        combine(prefs.modoDiscreto, contenidoOculto) { d, o -> d to o },
+    ) { caja, listaDePagos, total, sistema, (discreto, oculto) ->
         UiCaja(
             cargando = false,
             caja = caja,
             pagosDeHoy = listaDePagos,
             totalDeHoyCentavos = total,
             estadoDelSistema = sistema,
-            modoMostrador = mostrador,
             modoDiscreto = discreto,
             avisoConContenidoOculto = oculto,
         )
@@ -102,10 +99,6 @@ class CajaViewModel @Inject constructor(
     }
 
     fun cerrarCaja() = controlador.cerrarCaja()
-
-    fun alternarMostrador() {
-        modoMostrador.value = !modoMostrador.value
-    }
 
     fun alternarDiscreto() = viewModelScope.launch {
         prefs.fijarModoDiscreto(!prefs.modoDiscreto.first())

@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -33,18 +32,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.seef.checkqr.core.common.Dinero
 import com.seef.checkqr.core.designsystem.componentes.Aviso
 import com.seef.checkqr.core.designsystem.componentes.NivelDeAviso
-import com.seef.checkqr.core.designsystem.theme.TipografiaMostrador
-import com.seef.checkqr.core.model.MatchResult
 import java.util.concurrent.Executors
 
 /**
@@ -118,73 +113,6 @@ fun PantallaDeVerificar(
                 Button(onClick = vm::reiniciar) { Text("Intentar de nuevo") }
             }
         }
-    }
-}
-
-@Composable
-private fun Resultado(
-    estado: EstadoDeVerificacion.Resuelto,
-    onElegir: (com.seef.checkqr.core.model.Payment) -> Unit,
-    onReiniciar: () -> Unit,
-) {
-    val v = estado.veredicto
-
-    Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        val (simbolo, titulo, nivel) = when (v.resultado) {
-            MatchResult.COINCIDE -> Triple("✓", "Sí llegó", NivelDeAviso.INFORMATIVO)
-            MatchResult.NO_LLEGO -> Triple("✕", "No llegó", NivelDeAviso.PROBLEMA)
-            MatchResult.AMBIGUO -> Triple("?", "Hay que revisar", NivelDeAviso.ATENCION)
-            MatchResult.YA_RECLAMADO -> Triple("!", "Ya verificado antes", NivelDeAviso.ATENCION)
-        }
-
-        Text(
-            text = simbolo,
-            style = TipografiaMostrador.monto,
-            color = when (v.resultado) {
-                MatchResult.COINCIDE -> MaterialTheme.colorScheme.primary
-                MatchResult.NO_LLEGO -> MaterialTheme.colorScheme.error
-                else -> MaterialTheme.colorScheme.tertiary
-            },
-        )
-        Text(titulo, style = TipografiaMostrador.detalle)
-
-        v.pago?.let { p ->
-            Text(
-                Dinero.formatear(p.amountCents),
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.primary,
-            )
-            Text(p.payerName ?: "Sin nombre", style = MaterialTheme.typography.bodyLarge)
-            Text(p.wallet.nombreVisible, style = MaterialTheme.typography.bodyMedium)
-        }
-
-        Spacer(Modifier.height(12.dp))
-        Text(
-            v.explicacion,
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-
-        // Con varios candidatos, elige la persona: aqui no se adivina.
-        if (v.resultado == MatchResult.AMBIGUO && v.candidatos.isNotEmpty()) {
-            Spacer(Modifier.height(16.dp))
-            v.candidatos.forEach { p ->
-                OutlinedButton(
-                    onClick = { onElegir(p) },
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                ) {
-                    Text("${Dinero.formatear(p.amountCents)} · ${p.payerName ?: "sin nombre"}")
-                }
-            }
-        }
-
-        Spacer(Modifier.height(24.dp))
-        Button(onClick = onReiniciar) { Text("Verificar otro") }
     }
 }
 

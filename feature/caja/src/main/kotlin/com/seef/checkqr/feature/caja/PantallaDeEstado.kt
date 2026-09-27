@@ -8,21 +8,31 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.seef.checkqr.core.common.Calendario
+import com.seef.checkqr.core.data.repositorios.SenalDeBanco
+import com.seef.checkqr.core.designsystem.componentes.AvatarDeBilletera
 import com.seef.checkqr.core.designsystem.componentes.Aviso
+import com.seef.checkqr.core.designsystem.componentes.AvisoDeExito
+import com.seef.checkqr.core.designsystem.componentes.BarraSuperior
+import com.seef.checkqr.core.designsystem.componentes.EncabezadoDeSeccion
 import com.seef.checkqr.core.designsystem.componentes.NivelDeAviso
+import com.seef.checkqr.core.designsystem.theme.Espaciado
 import com.seef.checkqr.core.model.Wallet
 
 /**
@@ -32,6 +42,9 @@ import com.seef.checkqr.core.model.Wallet
  * listener se desconecta, si una marca mata el servicio, o si un banco cambia el
  * formato de sus avisos, no hay ningun error visible — simplemente dejan de
  * llegar pagos. Esta pantalla convierte ese silencio en algo que se puede mirar.
+ *
+ * Por eso lo primero que se ve es un veredicto en una linea: "Todo en orden" o
+ * el problema concreto. El detalle viene despues, para quien quiera mirarlo.
  */
 @Composable
 fun PantallaDeEstado(
@@ -41,91 +54,160 @@ fun PantallaDeEstado(
     val ui by vm.ui.collectAsStateWithLifecycle()
     val sistema = ui.estadoDelSistema
 
-    Column(
-        modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
-    ) {
-        Text("Estado del sistema", style = MaterialTheme.typography.headlineSmall)
-        Spacer(Modifier.height(16.dp))
-
-        if (sistema == null) {
-            Text("Cargando…")
-            return@Column
-        }
-
-        if (!sistema.listenerConectado) {
-            Aviso(
-                titulo = "El celular dejó de escuchar los pagos",
-                detalle = "Hay que volver a darle permiso a CheckQr para ver los avisos " +
-                    "de las apps del banco.",
-                nivel = NivelDeAviso.PROBLEMA,
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            BarraSuperior(
+                titulo = "Estado",
+                subtitulo = "Si CheckQr deja de escuchar, aquí se ve",
+                escuchando = sistema?.listenerConectado != false,
             )
-            Spacer(Modifier.height(12.dp))
-        }
+        },
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .verticalScroll(rememberScrollState()),
+        ) {
+            if (sistema == null) {
+                Text("Cargando…", modifier = Modifier.padding(Espaciado.estandar))
+                return@Column
+            }
 
-        if (sistema.plantillasSinVerificar) {
-            Aviso(
-                titulo = "Plantillas de banco sin verificar",
-                detalle = "Las plantillas que trae esta versión no se probaron todavía " +
-                    "contra avisos reales. Haz un pago de Bs 1 con cada billetera.",
-                nivel = NivelDeAviso.ATENCION,
+            Column(modifier = Modifier.padding(horizontal = Espaciado.estandar)) {
+                Spacer(Modifier.height(Espaciado.corto))
+
+                if (!sistema.requiereAtencion) {
+                    AvisoDeExito(
+                        titulo = "Todo en orden",
+                        detalle = "CheckQr está escuchando los avisos de tus bancos.",
+                    )
+                } else {
+                    if (!sistema.listenerConectado) {
+                        Aviso(
+                            titulo = "El celular dejó de escuchar los pagos",
+                            detalle = "Hay que volver a darle permiso a CheckQr para ver " +
+                                "los avisos de las apps del banco.",
+                            nivel = NivelDeAviso.PROBLEMA,
+                        )
+                        Spacer(Modifier.height(Espaciado.corto))
+                    }
+                    if (sistema.plantillasSinVerificar) {
+                        Aviso(
+                            titulo = "Plantillas de banco sin verificar",
+                            detalle = "Las plantillas que trae esta versión no se probaron " +
+                                "todavía contra avisos reales. Haz un pago de Bs 1 con cada " +
+                                "billetera.",
+                            nivel = NivelDeAviso.ATENCION,
+                        )
+                        Spacer(Modifier.height(Espaciado.corto))
+                    }
+                    if (sistema.avisosNoReconocidos > 0) {
+                        Aviso(
+                            titulo = "${sistema.avisosNoReconocidos} avisos no reconocidos",
+                            detalle = "Llegaron avisos de una app de banco que CheckQr no " +
+                                "supo leer. Suele significar que el banco cambió el formato " +
+                                "de sus mensajes.",
+                            nivel = NivelDeAviso.ATENCION,
+                        )
+                    }
+                }
+            }
+
+            EncabezadoDeSeccion(
+                texto = "Último aviso por banco",
+                acompanante = "${sistema.ultimoAvisoPorBilletera.size} de ${Wallet.soportadas.size}",
             )
-            Spacer(Modifier.height(12.dp))
-        }
 
-        if (sistema.avisosNoReconocidos > 0) {
-            Aviso(
-                titulo = "${sistema.avisosNoReconocidos} avisos no reconocidos",
-                detalle = "Llegaron avisos de una app de banco que CheckQr no supo leer. " +
-                    "Suele significar que el banco cambió el formato de sus mensajes.",
-                nivel = NivelDeAviso.ATENCION,
-            )
-            Spacer(Modifier.height(12.dp))
-        }
-
-        Text(
-            "Último aviso por banco",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(vertical = 8.dp),
-        )
-
-        Wallet.soportadas.forEach { billetera ->
-            val senal = sistema.ultimoAvisoPorBilletera[billetera]
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+            Surface(
+                modifier = Modifier.padding(horizontal = Espaciado.estandar),
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.surfaceContainer,
             ) {
-                Text(billetera.nombreVisible, style = MaterialTheme.typography.bodyLarge)
-                Text(
-                    text = when {
-                        senal == null -> "nunca"
-                        senal.ultimoOculto -> "oculto por el sistema"
-                        else -> {
-                            val h = Calendario.horaDe(senal.ultimoAvisoMillis)
-                            val d = Calendario.diaDe(senal.ultimoAvisoMillis)
-                            "$d %02d:%02d".format(h.hour, h.minute)
+                Column(modifier = Modifier.padding(vertical = Espaciado.corto)) {
+                    Wallet.soportadas.forEachIndexed { i, billetera ->
+                        FilaDeBanco(
+                            billetera = billetera,
+                            senal = sistema.ultimoAvisoPorBilletera[billetera],
+                        )
+                        if (i < Wallet.soportadas.lastIndex) {
+                            HorizontalDivider(
+                                modifier = Modifier.padding(start = 72.dp),
+                                color = MaterialTheme.colorScheme.outlineVariant
+                                    .copy(alpha = 0.4f),
+                            )
                         }
+                    }
+                }
+            }
+
+            if (sistema.billeterasSinSenal.isNotEmpty()) {
+                Column(
+                    modifier = Modifier.padding(
+                        horizontal = Espaciado.estandar,
+                        vertical = Espaciado.estandar,
+                    ),
+                ) {
+                    Aviso(
+                        titulo = "${sistema.billeterasSinSenal.size} billeteras sin ninguna señal",
+                        detalle = "Nunca llegó un aviso de " +
+                            sistema.billeterasSinSenal.joinToString { it.nombreVisible } +
+                            ". Puede ser que no las uses, o que CheckQr no reconozca su app.",
+                        nivel = NivelDeAviso.INFORMATIVO,
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(Espaciado.seccion))
+        }
+    }
+}
+
+@Composable
+private fun FilaDeBanco(billetera: Wallet, senal: SenalDeBanco?) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = Espaciado.estandar, vertical = Espaciado.medio),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            AvatarDeBilletera(billetera, tamano = 36.dp)
+            Spacer(Modifier.size(Espaciado.medio))
+            Text(billetera.nombreVisible, style = MaterialTheme.typography.bodyLarge)
+        }
+
+        when {
+            senal == null -> Text(
+                text = "Sin señal",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            senal.ultimoOculto -> Text(
+                text = "Contenido oculto",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.tertiary,
+                fontWeight = FontWeight.Medium,
+            )
+
+            else -> {
+                val hora = Calendario.horaDe(senal.ultimoAvisoMillis)
+                val dia = Calendario.diaDe(senal.ultimoAvisoMillis)
+                val hoy = Calendario.diaDe(System.currentTimeMillis())
+                Text(
+                    text = if (dia == hoy) {
+                        "Hoy %02d:%02d".format(hora.hour, hora.minute)
+                    } else {
+                        dia.toString()
                     },
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (senal == null) {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    } else {
-                        MaterialTheme.colorScheme.primary
-                    },
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Medium,
                 )
             }
-            HorizontalDivider()
-        }
-
-        if (sistema.billeterasSinSenal.isNotEmpty()) {
-            Spacer(Modifier.height(16.dp))
-            Aviso(
-                titulo = "${sistema.billeterasSinSenal.size} billeteras sin ninguna señal",
-                detalle = "Nunca llegó un aviso de: " +
-                    sistema.billeterasSinSenal.joinToString { it.nombreVisible } +
-                    ". Puede ser que no las uses, o que CheckQr no reconozca su app.",
-                nivel = NivelDeAviso.INFORMATIVO,
-            )
         }
     }
 }

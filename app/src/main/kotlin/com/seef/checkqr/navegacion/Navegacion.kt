@@ -12,6 +12,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.NavigationBarDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,6 +27,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import com.seef.checkqr.feature.caja.PantallaDeCaja
+import com.seef.checkqr.feature.caja.PantallaDeMostrador
 import com.seef.checkqr.feature.caja.PantallaDeEstado
 import com.seef.checkqr.feature.equipo.PantallaDeEquipo
 import com.seef.checkqr.feature.cuadre.PantallaDeCuadre
@@ -47,16 +50,27 @@ enum class Destino(val ruta: String, val etiqueta: String, val icono: ImageVecto
     ESTADO("estado", "Estado", Icons.Default.MonitorHeart),
 }
 
+/**
+ * El modo mostrador es un destino propio y no una pestana.
+ *
+ * Asi la barra inferior desaparece mientras esta activo — el celular queda
+ * apoyado y cualquier barra invita a toques accidentales — y el boton atras sale
+ * del mostrador en vez de cerrar la app.
+ */
+const val RUTA_MOSTRADOR: String = "mostrador"
+
 @Composable
 fun NavegacionDeCheckQr(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     val entrada by navController.currentBackStackEntryAsState()
     val destinoActual = entrada?.destination
+    val enMostrador = destinoActual?.route == RUTA_MOSTRADOR
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         bottomBar = {
-            NavigationBar {
+            if (enMostrador) return@Scaffold
+            NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceContainer) {
                 Destino.entries.forEach { destino ->
                     val seleccionado = destinoActual?.hierarchy?.any { it.route == destino.ruta } == true
                     NavigationBarItem(
@@ -80,15 +94,28 @@ fun NavegacionDeCheckQr(modifier: Modifier = Modifier) {
             }
         },
     ) { padding ->
+        // Solo el relleno de abajo: cada pantalla tiene su propia barra
+        // superior y aplica el inset del sistema por su cuenta. Pasarle aqui el
+        // relleno completo lo aplicaria dos veces y dejaria un hueco enorme
+        // bajo la barra de estado.
         NavHost(
             navController = navController,
             startDestination = Destino.CAJA.ruta,
-            modifier = Modifier.padding(padding),
+            modifier = Modifier.padding(bottom = padding.calculateBottomPadding()),
         ) {
             composable(
                 route = Destino.CAJA.ruta,
                 deepLinks = listOf(navDeepLink { uriPattern = "checkqr://checkqr.app/caja" }),
-            ) { PantallaDeCaja() }
+            ) {
+                PantallaDeCaja(
+                    onVerEstado = { navController.navigate(Destino.ESTADO.ruta) },
+                    onAbrirMostrador = { navController.navigate(RUTA_MOSTRADOR) },
+                )
+            }
+
+            composable(RUTA_MOSTRADOR) {
+                PantallaDeMostrador(onSalir = { navController.popBackStack() })
+            }
 
             composable(
                 route = Destino.VERIFICAR.ruta,
