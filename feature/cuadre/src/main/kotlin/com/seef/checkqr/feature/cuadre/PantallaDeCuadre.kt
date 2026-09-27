@@ -86,6 +86,7 @@ fun PantallaDeCuadre(
                 etiqueta = etiquetaDeDia(dia),
                 onAnterior = vm::diaAnterior,
                 onSiguiente = vm::diaSiguiente,
+                puedeAvanzar = dia < Calendario.diaDe(System.currentTimeMillis()),
             )
         }
 
@@ -130,7 +131,7 @@ fun PantallaDeCuadre(
         bloque("Por billetera", c.porBilletera)
         bloque("Por cajero", c.porCajero)
         bloque("Por turno", c.porTurno)
-        if (c.sinTurno.cantidad > 0) {
+        if (c.muestraSinTurno) {
             // El titulo dice donde encaja y la fila dice que son: repetir el
             // mismo texto en los dos sitios se lee como un error.
             bloque("Fuera de turno", listOf(c.sinTurno))
@@ -199,6 +200,8 @@ private fun SelectorDeDia(
     etiqueta: String,
     onAnterior: () -> Unit,
     onSiguiente: () -> Unit,
+    /** Falso en el dia de hoy: no hay manana que mostrar. */
+    puedeAvanzar: Boolean,
 ) {
     Row(
         modifier = Modifier
@@ -214,7 +217,7 @@ private fun SelectorDeDia(
             )
         }
         Text(etiqueta, style = MaterialTheme.typography.titleMedium)
-        IconButton(onClick = onSiguiente) {
+        IconButton(onClick = onSiguiente, enabled = puedeAvanzar) {
             Icon(
                 Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = "Día siguiente",
